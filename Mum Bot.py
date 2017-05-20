@@ -4,6 +4,13 @@ import pickle
 import datetime
 import os
 import time
+import logging
+
+logger = logging.getLogger('discord')
+logger.setLevel(logging.WARNING)
+handler = logging.FileHandler(filename='discord.log', encoding='utf-8', mode='w')
+handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
+logger.addHandler(handler)
 
 client = discord.Client()
 
@@ -749,6 +756,7 @@ async def on_message(message):
                             modvotemessage = await client.send_message(sendmedaddy, ':white_check_mark: to accept, :x: to reject', embed = post)
                             time.sleep(1)
                             await client.add_reaction(modvotemessage, '✅')
+                            time.sleep(1)
                             await client.add_reaction(modvotemessage, '❌')
                             saveauthor = message.author
                             savecontent = message.content
