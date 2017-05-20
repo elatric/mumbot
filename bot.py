@@ -190,13 +190,13 @@ async def on_message(message):
                     post_status_temp = sep[3]
                     post_status = post_status_temp.title()
                     if post_status != 'Retired':
-	                    post_stage_temp = sep[4]
-	                    post_stage = ''
-	                    if (post_stage_temp == '1') or (post_stage_temp == '2') or (post_stage_temp == '3') or (post_stage_temp == '4'):
-	                        post_stage = post_stage_temp
-	                    else:
-	                        await client.send_message(message.channel, 'Please check message parameters [Stage not found].')
-	                        return
+                        post_stage_temp = sep[4]
+                        post_stage = ''
+                        if (post_stage_temp == '1') or (post_stage_temp == '2') or (post_stage_temp == '3') or (post_stage_temp == '4'):
+                            post_stage = post_stage_temp
+                        else:
+                            await client.send_message(message.channel, 'Please check message parameters [Stage not found].')
+                            return
                     found_message = None
                     found = '0'
                     async for check in client.logs_from(vote):
@@ -694,6 +694,13 @@ async def on_message(message):
             statobject.close()
             statname = statid.name
             await client.send_message(message.channel, 'Roles:```Bot moderator role - {}\nVoice Chat Role - {}\n```\nChannels:```Listening Channels - {}\nSubmission Channel - {}\nModerator Voting Channel - {}\nUser Voting Channel - {}\nEmote Status Channel - {}```'.format(modname, voicename, listenname, subname, modchanname, votename, statname))
+        elif message.content.startswith('$settoken'):
+            parse = message.content
+            sep = parse.split()
+            tokenid = sep[1]
+            tokenobject = open('tokenid', 'wb')
+            pickle.dump(tokenid, tokenobject)
+            tokenobject.close()
         else:
             await client.send_message(message.channel, 'Invalid command.')
     elif (scheck == True) and (subtrue == True) and (emotesub == True) and (isitme == False):
@@ -709,7 +716,7 @@ async def on_message(message):
                 try:
                     await client.send_message(message.author, ':x: Your submission ' + message.content + ' contains unnecessary information. Please reread the pinned submission guidelines.')
                 except:
-                	print('Unable to message user' + ' ' + message.author.name)
+                    print('Unable to message user' + ' ' + message.author.name)
                 await client.delete_message(message)
                 return
             else:
@@ -717,9 +724,9 @@ async def on_message(message):
                 colcount = colcountstr.count(':')
                 if colcount != 2:
                     try:
-                    	await client.send_message(message.author, ':x: Your submission ' + message.content + '\'s name is incorrectly formatted. Please reread the pinned submission guidelines.')
+                        await client.send_message(message.author, ':x: Your submission ' + message.content + '\'s name is incorrectly formatted. Please reread the pinned submission guidelines.')
                     except:
-                	    print('Unable to message user ' + message.author.name)
+                        print('Unable to message user ' + message.author.name)
                     await client.delete_message(message)
                     return
                 else:
@@ -746,9 +753,9 @@ async def on_message(message):
                             saveauthor = message.author
                             savecontent = message.content
                             try:
-                            	await client.send_message(saveauthor, ':white_check_mark: Your submission ' + message.content + ' has been posted in the moderator review channel. Please wait for a status update.')
+                                await client.send_message(saveauthor, ':white_check_mark: Your submission ' + message.content + ' has been posted in the moderator review channel. Please wait for a status update.')
                             except:
-                            	print('Unable to message user ' + saveauthor.name)
+                                print('Unable to message user ' + saveauthor.name)
                             await client.delete_message(message)
                             voteemote = await client.wait_for_reaction(emoji=['❌', '✅'], message=modvotemessage, check=modvotecheck)
                             verdict = voteemote.reaction.emoji
@@ -761,24 +768,24 @@ async def on_message(message):
                                 await client.delete_message(denyreason)
                                 if reasonemote == '1⃣':
                                     try:
-                                    	await client.send_message(saveauthor,':x: Your submission ' + savecontent + ' has been rejected at stage 1, as it failed to meet the file requirements. Please reread the pinned submission guidelines.')
+                                        await client.send_message(saveauthor,':x: Your submission ' + savecontent + ' has been rejected at stage 1, as it failed to meet the file requirements. Please reread the pinned submission guidelines.')
                                     except:
-                                    	print('Unable to message user ' + saveauthor.name)
+                                        print('Unable to message user ' + saveauthor.name)
                                 elif reasonemote == '2⃣':
                                     try:
-                                    	await client.send_message(saveauthor, ':x: Your submission ' + savecontent + ' has been rejected at stage 1, as it failed to meet the content requirements. Please reread the pinned submission guidelines.')
+                                        await client.send_message(saveauthor, ':x: Your submission ' + savecontent + ' has been rejected at stage 1, as it failed to meet the content requirements. Please reread the pinned submission guidelines.')
                                     except:
-                                    	print('Unable to message user ' + saveauthor.name)
+                                        print('Unable to message user ' + saveauthor.name)
                                 else:
                                     try:
-                                    	await client.send_message(saveauthor, ':x: Your submission ' + savecontent + ' has been rejected at stage 1. Please reread the pinned submission guidelines.')
+                                        await client.send_message(saveauthor, ':x: Your submission ' + savecontent + ' has been rejected at stage 1. Please reread the pinned submission guidelines.')
                                     except:
-                                    	print('Unable to message user ' + saveauthor.name)
+                                        print('Unable to message user ' + saveauthor.name)
                             elif verdict == '✅':
                                 try:
                                     await client.send_message(saveauthor, ':white_check_mark: Your submission ' + savecontent + ' has passed stage 1, and has been posted in the emote voting channel.')
                                 except:
-                                	print('Unable to message user ' + saveauthor.name)
+                                    print('Unable to message user ' + saveauthor.name)
                                 vote = getvote()    
                                 votepost = discord.Embed(colour = discord.Colour.teal(), type='rich')
                                 votepost.set_image(url=post_image)
@@ -792,16 +799,16 @@ async def on_message(message):
                             return
                         else:
                             try:
-                            	await client.send_message(message.author, ':x: Your submission ' + message.content + '\'s image fails to meet the file requirements. Please reread the pinned submission guidelines.')
+                                await client.send_message(message.author, ':x: Your submission ' + message.content + '\'s image fails to meet the file requirements. Please reread the pinned submission guidelines.')
                             except:
-                            	print('Unable to message user ' + saveauthor.name)
+                                print('Unable to message user ' + saveauthor.name)
                             await client.delete_message(message)
                             return
                     else:
                         try:
-                        	await client.send_message(message.author, ':x: Your submission ' + message.content + ' doesn\'t contain an attached image. Please reread the pinned submission guidelines.')
+                            await client.send_message(message.author, ':x: Your submission ' + message.content + ' doesn\'t contain an attached image. Please reread the pinned submission guidelines.')
                         except:
-                        	print('Unable to message user ' + saveauthor.name)
+                            print('Unable to message user ' + saveauthor.name)
                         await client.delete_message(message)
                         return
     elif message.server == None and message.content.startswith('$') and isitme == False:
@@ -811,4 +818,7 @@ async def on_message(message):
     elif message.content.startswith('$') and mcheck == False and isitme == False and ccheck == True:
         await client.send_message(message.channel, 'You do not have permission to use this command.')
 
-client.run('MzA1ODMzMDkxODc5MTQxMzk2.C9680w.4SOEAgdfmwuNzOyECZdbkRIsCiQ')
+tokenobject = open('tokenid', 'rb')
+tokenid = pickle.load(tokenobject)
+tokenobject.close()
+client.run(tokenid)
