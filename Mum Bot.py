@@ -128,7 +128,7 @@ def modvotecheck(reaction, user):
     emoji3 = e.startswith('1⃣')
     emoji4 = e.startswith('2⃣')
     reactor = modcheck(user)
-    if (emoji1 == True or emoji2 == True or emoji3 == True or emoji4 == True) and reactor == True:
+    if reactor == True:
         return True
 
 def selfcheck(user):
@@ -711,7 +711,7 @@ async def on_message(message):
         else:
             await client.send_message(message.channel, 'Invalid command.')
     elif (scheck == True) and (subtrue == True) and (emotesub == True) and (isitme == False):
-        time.sleep(3)
+        time.sleep(1)
         try: 
             message 
         except NameError: 
@@ -754,9 +754,9 @@ async def on_message(message):
                             post.add_field(name='Submitted by: ', value = message.author.mention, inline=True)
                             post.set_image(url=post_image)
                             modvotemessage = await client.send_message(sendmedaddy, ':white_check_mark: to accept, :x: to reject', embed = post)
-                            time.sleep(1)
+                            time.sleep(0.5)
                             await client.add_reaction(modvotemessage, '✅')
-                            time.sleep(1)
+                            time.sleep(0.5)
                             await client.add_reaction(modvotemessage, '❌')
                             saveauthor = message.author
                             savecontent = message.content
@@ -769,7 +769,9 @@ async def on_message(message):
                             verdict = voteemote.reaction.emoji
                             if verdict == '❌':
                                 denyreason = await client.send_message(sendmedaddy, ':one: for file requirements, :two: for content requirements')
+                                time.sleep(0.5)
                                 await client.add_reaction(denyreason, '1⃣')
+                                time.sleep(0.5)
                                 await client.add_reaction(denyreason, '2⃣')
                                 votereason = await client.wait_for_reaction(emoji=['1⃣', '2⃣'], message=denyreason, check=modvotecheck)
                                 reasonemote = votereason.reaction.emoji
