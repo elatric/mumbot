@@ -145,6 +145,12 @@ def getvoicerole(member):
     voicerole = discord.utils.get(member.server.roles, id=voiceid)
     return voicerole
 
+def addnote(message):
+    if message.content.startswith('note'):
+        return True
+    else:
+        return False
+
 @client.event
 async def on_ready():
     print('Logged in as')
@@ -164,6 +170,114 @@ def on_voice_state_update(before, after):
                     yield from client.add_roles(after, giverole)
             except AttributeError:
                 yield from client.remove_roles(after, giverole)
+
+@client.event
+async def on_reaction_add(reaction, user):
+    scheck = servercheck(reaction.message)
+    mcheck = modcheck(user)
+    isitme = selfcheck(user)
+    mvchannel = getmodvote()
+    mvtrue = False
+    found_embeds_temp = reaction.message.embeds
+    if mvchannel.id == reaction.message.channel.id:
+        mvtrue = True
+    if (scheck == True) and (mcheck == True) and (mvtrue == True) and (isitme == False) and (len(found_embeds_temp) != 0):
+        server = client.get_server('214249708711837696')
+        livingroom = client.get_channel('214249708711837696')
+        verdict = reaction.emoji
+        sendmedaddy = getmodvote()
+        found_embeds = found_embeds_temp[0]
+        findfields = found_embeds['fields']
+        found_name = ''
+        found_emotename = ''
+        post_image = found_embeds['image']['url']
+        findname = found_embeds['fields']
+        for field in findfields:
+            if ('Submitted by:' in field['name']):
+                found_name = field['value']
+            elif ('Emote Name:' in field['name']):
+                found_emotename = field['value']
+        if '<@!' in found_name:
+        	finalid1 = found_name.replace('<@!', '')
+        else:
+        	finalid1 = found_name.replace('<@', '')
+        finalid = finalid1.replace('>', '')
+        saveauthor = server.get_member(finalid)
+        if verdict == '❌':
+            denyreason = await client.send_message(sendmedaddy, ':one: for file requirements, :two: for content requirements')
+            time.sleep(0.5)
+            await client.add_reaction(denyreason, '1⃣')
+            time.sleep(0.5)
+            await client.add_reaction(denyreason, '2⃣')
+            denychoose = await client.wait_for_reaction(emoji=['1⃣', '2⃣'], message=denyreason, check=modvotecheck)
+            reasonemote = denychoose.reaction.emoji
+            denynote = await client.send_message(sendmedaddy, 'Would you like to add a note? :white_check_mark: or :x:')
+            time.sleep(0.5)
+            await client.add_reaction(denynote, '✅')
+            time.sleep(0.5)
+            await client.add_reaction(denynote, '❌')
+            denynotereact = await client.wait_for_reaction(emoji=['✅', '❌'], message=denynote, check=modvotecheck)
+            notevote = denynotereact.reaction.emoji
+            findtrue = 0
+            if notevote == '✅':
+            	findtrue = 1
+            if reasonemote == '1⃣':
+                if findtrue == 1:
+                    notemessage = await client.send_message(sendmedaddy, 'Please type your note. Your message **must** begin with note (e.g. `note this sucks`)')
+                    responsetemp = await client.wait_for_message(check=addnote, channel=sendmedaddy)
+                    response = responsetemp.content.replace('note ','')
+                    try:
+                        await client.send_message(saveauthor,':x: Your submission ' + found_emotename + ' has been rejected at stage 1, as it failed to meet the file requirements. Please reread the pinned submission guidelines.')
+                        await client.send_message(saveauthor,'A reviewer gave the following note:```'+response+'```')
+                    except:
+                        await client.send_message(livingroom, saveauthor.mention + ' :x: Your submission ' + found_emotename + ' has been rejected at stage 1, as it failed to meet the file requirements. Please reread the pinned submission guidelines.')
+                        await client.send_message(livingroom,'A reviewer gave the following note:```'+response+'```')
+                    await client.delete_message(notemessage)
+                    await client.delete_message(responsetemp)
+                else:
+                    try:
+                        await client.send_message(saveauthor,':x: Your submission ' + found_emotename + ' has been rejected at stage 1, as it failed to meet the file requirements. Please reread the pinned submission guidelines.')
+                    except:
+                        await client.send_message(livingroom, saveauthor.mention + ' :x: Your submission ' + found_emotename + ' has been rejected at stage 1, as it failed to meet the file requirements. Please reread the pinned submission guidelines.')
+            elif reasonemote == '2⃣':
+                if findtrue == 1:
+                    notemessage = await client.send_message(sendmedaddy, 'Please type your note. Your message **must** begin with \'note\' or \'Note\' (e.g. `note this sucks`)')
+                    responsetemp = await client.wait_for_message(check=addnote, channel=sendmedaddy)
+                    response = responsetemp.content.replace('note ','')
+                    try:
+                        await client.send_message(saveauthor,':x: Your submission ' + found_emotename + ' has been rejected at stage 1, as it failed to meet the content requirements. Please reread the pinned submission guidelines.')
+                        await client.send_message(saveauthor,'A reviewer gave the following note:```'+response+'```')
+                    except:
+                        await client.send_message(livingroom, saveauthor.mention + ' :x: Your submission ' + found_emotename + ' has been rejected at stage 1, as it failed to meet the content requirements. Please reread the pinned submission guidelines.')
+                        await client.send_message(livingroom,'A reviewer gave the following note:```'+response+'```')
+                    await client.delete_message(notemessage)
+                    await client.delete_message(responsetemp)
+                else:
+                    try:
+                        await client.send_message(saveauthor, ':x: Your submission ' + found_emotename + ' has been rejected at stage 1, as it failed to meet the content requirements. Please reread the pinned submission guidelines.')
+                    except:
+                        await client.send_message(livingroom, saveauthor.mention + ' :x: Your submission ' + found_emotename + ' has been rejected at stage 1, as it failed to meet the content requirements. Please reread the pinned submission guidelines.')
+            else:
+                try:
+                    await client.send_message(saveauthor, ':x: Your submission ' + found_emotename + ' has been rejected at stage 1. Please reread the pinned submission guidelines.')
+                except:
+                    await client.send_message(livingroom, saveauthor.mention + ' :x: Your submission ' + found_emotename + ' has been rejected at stage 1. Please reread the pinned submission guidelines.')
+            await client.delete_message(denyreason)
+            await client.delete_message(denynote)
+            await client.delete_message(reaction.message)
+        elif verdict == '✅':
+            try:
+                await client.send_message(saveauthor, ':white_check_mark: Your submission ' + found_emotename + ' has passed stage 1, and has been posted in the emote voting channel.')
+            except:
+                await client.send_message(livingroom, saveauthor.mention + ' :white_check_mark: Your submission ' + found_emotename + ' has passed stage 1, and has been posted in the emote voting channel.')
+            vote = getvote()    
+            votepost = discord.Embed(colour = discord.Colour.teal(), type='rich')
+            votepost.set_image(url=post_image)
+            votepost.add_field(name='Emote Name: ', value = found_emotename, inline=True)
+            votepost.add_field(name='Submitted by: ', value = saveauthor.mention, inline=True)
+            votepost.timestamp = datetime.datetime.now()
+            publicvotemessage = await client.send_message(vote, embed = votepost)
+            await client.delete_message(reaction.message)
 
 @client.event
 async def on_message(message):
@@ -714,16 +828,18 @@ async def on_message(message):
         time.sleep(1)
         try: 
             message 
-        except NameError: 
+        except:
+            print('Message mum, something went wrong') 
             return
         else:
+            livingroom = client.get_channel('214249708711837696')
             parse = message.content
             sep = parse.split()
             if len(sep) != 1:
                 try:
                     await client.send_message(message.author, ':x: Your submission ' + message.content + ' contains unnecessary information. Please reread the pinned submission guidelines.')
                 except:
-                    print('Unable to message user' + ' ' + message.author.name)
+                    await client.send_message(livingroom, message.author.mention+' :x: Your submission ' + message.content + ' contains unnecessary information. Please reread the pinned submission guidelines.')
                 await client.delete_message(message)
                 return
             else:
@@ -733,7 +849,7 @@ async def on_message(message):
                     try:
                         await client.send_message(message.author, ':x: Your submission ' + message.content + '\'s name is incorrectly formatted. Please reread the pinned submission guidelines.')
                     except:
-                        print('Unable to message user ' + message.author.name)
+                        await client.send_message(livingroom, message.author.mention + ' :x: Your submission ' + message.content + '\'s name is incorrectly formatted. Please reread the pinned submission guidelines.')
                     await client.delete_message(message)
                     return
                 else:
@@ -763,62 +879,20 @@ async def on_message(message):
                             try:
                                 await client.send_message(saveauthor, ':white_check_mark: Your submission ' + message.content + ' has been posted in the moderator review channel. Please wait for a status update.')
                             except:
-                                print('Unable to message user ' + saveauthor.name)
+                                await client.send_message(livingroom, message.author.mention+' :white_check_mark: Your submission ' + message.content + ' has been posted in the moderator review channel. Please wait for a status update.')
                             await client.delete_message(message)
-                            voteemote = await client.wait_for_reaction(emoji=['❌', '✅'], message=modvotemessage, check=modvotecheck)
-                            verdict = voteemote.reaction.emoji
-                            if verdict == '❌':
-                                denyreason = await client.send_message(sendmedaddy, ':one: for file requirements, :two: for content requirements')
-                                time.sleep(0.5)
-                                await client.add_reaction(denyreason, '1⃣')
-                                time.sleep(0.5)
-                                await client.add_reaction(denyreason, '2⃣')
-                                votereason = await client.wait_for_reaction(emoji=['1⃣', '2⃣'], message=denyreason, check=modvotecheck)
-                                reasonemote = votereason.reaction.emoji
-                                await client.delete_message(denyreason)
-                                if reasonemote == '1⃣':
-                                    try:
-                                        await client.send_message(saveauthor,':x: Your submission ' + savecontent + ' has been rejected at stage 1, as it failed to meet the file requirements. Please reread the pinned submission guidelines.')
-                                    except:
-                                        print('Unable to message user ' + saveauthor.name)
-                                elif reasonemote == '2⃣':
-                                    try:
-                                        await client.send_message(saveauthor, ':x: Your submission ' + savecontent + ' has been rejected at stage 1, as it failed to meet the content requirements. Please reread the pinned submission guidelines.')
-                                    except:
-                                        print('Unable to message user ' + saveauthor.name)
-                                else:
-                                    try:
-                                        await client.send_message(saveauthor, ':x: Your submission ' + savecontent + ' has been rejected at stage 1. Please reread the pinned submission guidelines.')
-                                    except:
-                                        print('Unable to message user ' + saveauthor.name)
-                            elif verdict == '✅':
-                                try:
-                                    await client.send_message(saveauthor, ':white_check_mark: Your submission ' + savecontent + ' has passed stage 1, and has been posted in the emote voting channel.')
-                                except:
-                                    print('Unable to message user ' + saveauthor.name)
-                                vote = getvote()    
-                                votepost = discord.Embed(colour = discord.Colour.teal(), type='rich')
-                                votepost.set_image(url=post_image)
-                                votepost.add_field(name='Emote Name: ', value = sep[0], inline=True)
-                                votepost.add_field(name='Submitted by: ', value = saveauthor.mention, inline=True)
-                                votepost.timestamp = datetime.datetime.now()
-                                publicvotemessage = await client.send_message(vote, embed = votepost)
-                                '''await client.add_reaction(publicvotemessage, '👍')
-                                await client.add_reaction(publicvotemessage, '👎')'''
-                            await client.delete_message(modvotemessage)
-                            return
                         else:
                             try:
                                 await client.send_message(message.author, ':x: Your submission ' + message.content + '\'s image fails to meet the file requirements. Please reread the pinned submission guidelines.')
                             except:
-                                print('Unable to message user ' + saveauthor.name)
+                                await client.send_message(livingroom, message.author.mention+' :x: Your submission ' + message.content + '\'s image fails to meet the file requirements. Please reread the pinned submission guidelines.')
                             await client.delete_message(message)
                             return
                     else:
                         try:
                             await client.send_message(message.author, ':x: Your submission ' + message.content + ' doesn\'t contain an attached image. Please reread the pinned submission guidelines.')
                         except:
-                            print('Unable to message user ' + saveauthor.name)
+                            await client.send_message(livingroom, message.author.mention+' :x: Your submission ' + message.content + ' doesn\'t contain an attached image. Please reread the pinned submission guidelines.')
                         await client.delete_message(message)
                         return
     elif message.server == None and message.content.startswith('$') and isitme == False:
