@@ -198,19 +198,24 @@ async def on_reaction_add(reaction, user):
             elif ('Emote Name:' in field['name']):
                 found_emotename = field['value']
         if '<@!' in found_name:
-        	finalid1 = found_name.replace('<@!', '')
+            finalid1 = found_name.replace('<@!', '')
         else:
-        	finalid1 = found_name.replace('<@', '')
+            finalid1 = found_name.replace('<@', '')
         finalid = finalid1.replace('>', '')
         saveauthor = server.get_member(finalid)
         if verdict == '❌':
-            denyreason = await client.send_message(sendmedaddy, ':one: for file requirements, :two: for content requirements')
+            denyreason = await client.send_message(sendmedaddy, ':one: for file requirements, :two: for content requirements :x: to cancel')
             time.sleep(0.5)
             await client.add_reaction(denyreason, '1⃣')
             time.sleep(0.5)
             await client.add_reaction(denyreason, '2⃣')
-            denychoose = await client.wait_for_reaction(emoji=['1⃣', '2⃣'], message=denyreason, check=modvotecheck)
+            time.sleep(0.5)
+            await client.add_reaction(denyreason, '❌')
+            denychoose = await client.wait_for_reaction(emoji=['1⃣', '2⃣', '❌'], message=denyreason, check=modvotecheck)
             reasonemote = denychoose.reaction.emoji
+            if reasonemote == '❌':
+                await client.delete_message(denychoose.reaction.message)
+                return
             denynote = await client.send_message(sendmedaddy, 'Would you like to add a note? :white_check_mark: or :x:')
             time.sleep(0.5)
             await client.add_reaction(denynote, '✅')
@@ -220,7 +225,7 @@ async def on_reaction_add(reaction, user):
             notevote = denynotereact.reaction.emoji
             findtrue = 0
             if notevote == '✅':
-            	findtrue = 1
+                findtrue = 1
             if reasonemote == '1⃣':
                 if findtrue == 1:
                     notemessage = await client.send_message(sendmedaddy, 'Please type your note. Your message **must** begin with note (e.g. `note this sucks`)')
@@ -765,7 +770,7 @@ async def on_message(message):
                 else:
                     await client.send_message(message.channel, 'Invalid command or input. Type `$feature` for command syntax.')
         elif message.content.startswith('$help'):
-            await client.send_message(message.channel, 'Available commands: ```$status - post a status update or edit a status update for an emote\n$feature - turn bot modules on/off\n$iloveyou - OK I ADMIT IT\n$settings - view roles and channels for this bot\n$modset - set the moderator role for this bot\n$voiceroleset - set the automatic voice role to be given\n$listen - add or remove a channel for the bot to listen to\n$subset - set the emote submission channel\n$modvoteset - set the moderator voting channel\n$voteset - set the user voting channel\n$statset - set the emote status channel```')
+            await client.send_message(message.channel, 'Available commands: ```$status - post a status update or edit a status update for an emote\n$feature - turn bot modules on/off\n$iloveyou - OK I ADMIT IT\n$purge - delete messages from a channel\n$settings - view roles and channels for this bot\n$modset - set the moderator role for this bot\n$voiceroleset - set the automatic voice role to be given\n$listen - add or remove a channel for the bot to listen to\n$subset - set the emote submission channel\n$modvoteset - set the moderator voting channel\n$voteset - set the user voting channel\n$statset - set the emote status channel```')
         elif message.content.startswith('$iloveyou'):
             await client.send_message(message.channel, 'OK I ADMIT IT I LOVE YOU OK i fucking love you and it breaks my heart when i see you play with someone else or anyone commenting in your profile i just want to be your boyfriend and put a heart in my profile linking to your profile and have a walltext of you commenting cute things i want to play video games talk in discord all night and watch a movie together but you just seem so uninterested in me it fucking kills me and i cant take it anymore i want to remove you but i care too much about you so please i\'m begging you to either love me back or remove me and NEVER contact me again it hurts so much to say this because i need you by my side but if you don\'t love me then i want you to leave because seeing your icon in my friendlist would kill me everyday of my pathetic life')
         elif message.content.startswith('$settings'):
@@ -822,16 +827,35 @@ async def on_message(message):
             tokenobject = open('tokenid', 'wb')
             pickle.dump(tokenid, tokenobject)
             tokenobject.close()
+        elif message.content.startswith('$purge'):
+            parse = message.content
+            sep = parse.split()
+            if len(sep) == 2:
+                mgs = []
+                number = sep[1]
+                number = int(number)
+                if number >= 2:
+                    async for x in client.logs_from(message.channel, limit = number):
+                        mgs.append(x)
+                    await client.send_message(message.channel, 'Purging `'+sep[1]+'` messages')
+                    await client.delete_messages(mgs)
+                else:
+                    await client.send_message(message.channel, 'Invalid number of messages to purge!')
+            elif len(sep) == 1:
+                await client.send_message(message.channel, 'Command syntax is as follows: `$purge [# of messages to purge]` -- number must be >= 2')
+            else:
+                    await client.send_message(message.channel, 'Invalid input! Type `$purge` for command syntax')
         else:
             await client.send_message(message.channel, 'Invalid command.')
     elif (scheck == True) and (subtrue == True) and (emotesub == True) and (isitme == False):
-        time.sleep(1)
+        time.sleep(2)
         try: 
             message 
         except:
             print('Message mum, something went wrong') 
             return
         else:
+            logchannel = client.get_channel('300752762973585418')
             livingroom = client.get_channel('214249708711837696')
             parse = message.content
             sep = parse.split()
@@ -840,6 +864,11 @@ async def on_message(message):
                     await client.send_message(message.author, ':x: Your submission ' + message.content + ' contains unnecessary information. Please reread the pinned submission guidelines.')
                 except:
                     await client.send_message(livingroom, message.author.mention+' :x: Your submission ' + message.content + ' contains unnecessary information. Please reread the pinned submission guidelines.')
+                post_image = '`none`'
+                found_embeds = message.attachments
+                for tempembed in found_embeds:
+                    post_image = tempembed['url']
+                await client.send_message(logchannel, message.author.mention + ' wrote ```' + message.content + '``` with image ' + post_image)
                 await client.delete_message(message)
                 return
             else:
@@ -850,6 +879,11 @@ async def on_message(message):
                         await client.send_message(message.author, ':x: Your submission ' + message.content + '\'s name is incorrectly formatted. Please reread the pinned submission guidelines.')
                     except:
                         await client.send_message(livingroom, message.author.mention + ' :x: Your submission ' + message.content + '\'s name is incorrectly formatted. Please reread the pinned submission guidelines.')
+                    post_image = '`none`'
+                    found_embeds = message.attachments
+                    for tempembed in found_embeds:
+                        post_image = tempembed['url']
+                    await client.send_message(logchannel, message.author.mention + ' wrote ```' + message.content + '``` with image ' + post_image)
                     await client.delete_message(message)
                     return
                 else:
@@ -893,12 +927,31 @@ async def on_message(message):
                             await client.send_message(message.author, ':x: Your submission ' + message.content + ' doesn\'t contain an attached image. Please reread the pinned submission guidelines.')
                         except:
                             await client.send_message(livingroom, message.author.mention+' :x: Your submission ' + message.content + ' doesn\'t contain an attached image. Please reread the pinned submission guidelines.')
+                        await client.send_message(logchannel, message.author.mention + ' wrote ```' + message.content + '```')
                         await client.delete_message(message)
                         return
     elif message.server == None and message.content.startswith('$') and isitme == False:
         await client.send_message(message.author, 'You cannot use commands in DMs.')
     elif message.content.startswith('$iloveyou') and mcheck == True:
         await client.send_message(message.channel, 'OK I ADMIT IT I LOVE YOU OK i fucking love you and it breaks my heart when i see you play with someone else or anyone commenting in your profile i just want to be your boyfriend and put a heart in my profile linking to your profile and have a walltext of you commenting cute things i want to play video games talk in discord all night and watch a movie together but you just seem so uninterested in me it fucking kills me and i cant take it anymore i want to remove you but i care too much about you so please i\'m begging you to either love me back or remove me and NEVER contact me again it hurts so much to say this because i need you by my side but if you don\'t love me then i want you to leave because seeing your icon in my friendlist would kill me everyday of my pathetic life')
+    elif message.content.startswith('$purge') and mcheck == True:
+        parse = message.content
+        sep = parse.split()
+        if len(sep) == 2:
+            mgs = []
+            number = sep[1]
+            number = int(number)
+            if number >= 2:
+                async for x in client.logs_from(message.channel, limit = number):
+                    mgs.append(x)
+                await client.send_message(message.channel, 'Purging `'+sep[1]+'` messages')
+                await client.delete_messages(mgs)
+            else:
+                await client.send_message(message.channel, 'Invalid number of messages to purge!')
+        elif len(sep) == 1:
+            await client.send_message(message.channel, 'Command syntax is as follows: `$purge [# of messages to purge]` -- number must be >= 2')
+        else:
+            await client.send_message(message.channel, 'Invalid input! Type `$purge` for command syntax')
     elif message.content.startswith('$') and mcheck == False and isitme == False and ccheck == True:
         await client.send_message(message.channel, 'You do not have permission to use this command.')
 
