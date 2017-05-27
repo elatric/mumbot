@@ -5,6 +5,10 @@ import datetime
 import os
 import time
 import logging
+import urllib.request
+import sys
+import wget
+import urllib.request
 
 logger = logging.getLogger('discord')
 logger.setLevel(logging.WARNING)
@@ -150,6 +154,28 @@ def addnote(message):
         return True
     else:
         return False
+
+async def storeimage(link):
+    storechannel = client.get_channel('317835738458619904')
+    sendheader = tokenid
+    if '.com' in link:
+        opener = urllib.request.build_opener()
+        opener.addheaders = [('User-Agent','Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_4) AppleWebKit/603.1.30 (KHTML, like Gecko) Version/10.1 Safari/603.1.30')]
+        urllib.request.install_opener(opener)
+        filename, headers = urllib.request.urlretrieve(url=link)
+        #filename = wget.download(link)
+        os.rename(filename, filename + ".png")
+        newfilename = filename + '.png'
+        sendimage = open(os.path.abspath(newfilename), 'rb')
+        stored_image = await client.send_file(storechannel, newfilename, content=None)
+        sendimage.close()
+        found_embeds = stored_image.attachments
+        for tempembed in found_embeds:
+            post_image = tempembed['url'] 
+        return post_image
+    else:
+        print('Something went wrong when storing the image')
+        return None
 
 @client.event
 async def on_ready():
@@ -844,7 +870,10 @@ async def on_message(message):
             elif len(sep) == 1:
                 await client.send_message(message.channel, 'Command syntax is as follows: `$purge [# of messages to purge]` -- number must be >= 2')
             else:
-                    await client.send_message(message.channel, 'Invalid input! Type `$purge` for command syntax')
+                await client.send_message(message.channel, 'Invalid input! Type `$purge` for command syntax')
+        elif message.content.startswith('$terminate'):
+            await client.send_message(message.channel, message.author.mention + ' has terminated Mum\'s Helper')
+            sys.exit()
         else:
             await client.send_message(message.channel, 'Invalid command.')
     elif (scheck == True) and (subtrue == True) and (emotesub == True) and (isitme == False):
@@ -867,7 +896,7 @@ async def on_message(message):
                 post_image = '`none`'
                 found_embeds = message.attachments
                 for tempembed in found_embeds:
-                    post_image = tempembed['url']
+                    post_image = tempembed['proxy_url']
                 await client.send_message(logchannel, message.author.mention + ' wrote ```' + message.content + '``` with image ' + post_image)
                 await client.delete_message(message)
                 return
@@ -882,7 +911,7 @@ async def on_message(message):
                     post_image = '`none`'
                     found_embeds = message.attachments
                     for tempembed in found_embeds:
-                        post_image = tempembed['url']
+                        post_image = tempembed['proxy_url']
                     await client.send_message(logchannel, message.author.mention + ' wrote ```' + message.content + '``` with image ' + post_image)
                     await client.delete_message(message)
                     return
@@ -890,7 +919,9 @@ async def on_message(message):
                     post_image = ''
                     found_embeds = message.attachments
                     for tempembed in found_embeds:
-                        post_image = tempembed['url']
+                        temp_image = tempembed['url']
+                    print(temp_image)
+                    post_image = await storeimage(temp_image)
                     if post_image != '':
                         iwidth = ''
                         iheight = ''
