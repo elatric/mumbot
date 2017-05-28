@@ -874,6 +874,20 @@ async def on_message(message):
         elif message.content.startswith('$terminate'):
             await client.send_message(message.channel, message.author.mention + ' has terminated Mum\'s Helper')
             sys.exit()
+        elif message.content.startswith('$startvote'):
+            vote = getvote()
+            await client.send_message(message.channel, message.author.mention + ' has opened voting in `'+vote.id+'`')
+            await client.send_message(message.channel, 'Now adding reactions')
+            async for x in client.logs_from(vote):
+                if selfcheck(x.author) == True:
+                    try:
+                        await client.add_reaction(x, '👍')
+                    except:
+                    	print('owo')
+                    try:
+                        await client.add_reaction(x, '👎')
+                    except:
+                    	print('owo')
         else:
             await client.send_message(message.channel, 'Invalid command.')
     elif (scheck == True) and (subtrue == True) and (emotesub == True) and (isitme == False):
