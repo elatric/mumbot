@@ -158,7 +158,7 @@ def addnote(message):
 async def storeimage(link):
     storechannel = client.get_channel('317835738458619904')
     sendheader = tokenid
-    if '.com' in link:
+    if ('.com' in link) or ('.net' in link):
         opener = urllib.request.build_opener()
         opener.addheaders = [('User-Agent','Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_4) AppleWebKit/603.1.30 (KHTML, like Gecko) Version/10.1 Safari/603.1.30')]
         urllib.request.install_opener(opener)
@@ -203,11 +203,12 @@ async def on_reaction_add(reaction, user):
     mcheck = modcheck(user)
     isitme = selfcheck(user)
     mvchannel = getmodvote()
+    emotesub = emotesubonoff()
     mvtrue = False
     found_embeds_temp = reaction.message.embeds
     if mvchannel.id == reaction.message.channel.id:
         mvtrue = True
-    if (scheck == True) and (mcheck == True) and (mvtrue == True) and (isitme == False) and (len(found_embeds_temp) != 0):
+    if (scheck == True) and (mcheck == True) and (mvtrue == True) and (isitme == False) and (emotesub == True) and (len(found_embeds_temp) != 0):
         server = client.get_server('214249708711837696')
         livingroom = client.get_channel('214249708711837696')
         verdict = reaction.emoji
@@ -323,115 +324,151 @@ async def on_message(message):
             vote = getvote()
             stat = getstat()
             if message.content == '$status help' or message.content == '$status':
-                await client.send_message(message.channel, '```$status [Set/Edit/Delete] [Emote Name **in colons**] [Approved/Rejected/Pending/Global/Retired/Status Attribute] [Stage #] [Note]\nStatus Attributes: Name, Image, Author, Status, Note```')
+                await client.send_message(message.channel, '```$status [Set/Edit/Delete] [Emote Name **in colons** or Massreject] [Approved/Rejected/Pending/Global/Retired/Status Attribute/ # to reject] [Stage #] [Note]\nStatus Attributes: Name, Image, Author, Status, Note```')
             else:
                 parse = message.content
                 sep = parse.split()
-                if sep[1] == 'set': 
-                    colcountstr = sep[2]
-                    colcount = colcountstr.count(':')
-                    colfix = ''
-                    if colcount != 2 and colcount != 0:
-                        colfix = colcountstr.replace(':', '')
-                        colfix = ':' + colcountstr + ':'
-                    elif colcount == 0:
-                        colfix = ':' + colcountstr + ':'
-                    else:
-                        colfix = colcountstr
-                    find_key = colfix
-                    post_status_temp = sep[3]
-                    post_status = post_status_temp.title()
-                    if post_status != 'Retired':
-                        post_stage_temp = sep[4]
-                        post_stage = ''
-                        if (post_stage_temp == '1') or (post_stage_temp == '2') or (post_stage_temp == '3') or (post_stage_temp == '4'):
-                            post_stage = post_stage_temp
+                if sep[1] == 'set':
+                    if sep[2] == 'Massreject' and len(sep) == 4:
+                        print('Running Massreject')
+                        async for found_message in client.logs_from(vote, limit=sep[3]):
+                            if selfcheck(found_message.author) == True:
+                                post_status = 'Rejected'
+                                post_stage = '3'
+                                post_up = None
+                                post_down = None
+                                post_reactions = found_message.reactions
+                                for tempreact in post_reactions:
+                                    if tempreact.emoji == '👍':
+                                        post_up = tempreact.count
+                                    elif tempreact.emoji == '👎':
+                                        post_down = tempreact.count
+                                post_image = 'https://img.ifcdn.com/images/9871875b70ccd920395f799284902f3c4b3fd519f9c1c1000aa95dd4ab9f159b_1.jpg'
+                                found_embeds_temp = found_message.embeds
+                                found_embeds = found_embeds_temp[0]
+                                post_image=found_embeds['image']['url']
+                                found_name = ''
+                                find_key = ''
+                                findfields = found_embeds['fields']
+                                for field in findfields:
+                                    if ('Submitted by:' in field['name']):
+                                        found_name = field['value']
+                                    elif ('Emote Name:' in field['name']):
+                                        find_key = field['value']
+                                post_colour = discord.Colour.red()
+                                post = discord.Embed(colour = post_colour)
+                                post.set_image(url=post_image)
+                                post.set_author(name=message.author.name, icon_url=message.author.avatar_url)
+                                post.add_field(name='Emote Name: ', value = find_key, inline=True)
+                                post.add_field(name='Status: ', value='**' + post_status + '** at stage ' + post_stage + ' (' + str(post_up) + ' 👍 - ' + str(post_down) + ' 👎)', inline=False)
+                                post.add_field(name='Submitted by: ', value = found_name, inline=True)
+                                post.timestamp = datetime.datetime.now()
+                                await client.send_message(stat, found_name, embed = post)
+                    elif sep[2] != 'Massreject':     
+                        colcountstr = sep[2]
+                        colcount = colcountstr.count(':')
+                        colfix = ''
+                        if colcount != 2 and colcount != 0:
+                            colfix = colcountstr.replace(':', '')
+                            colfix = ':' + colcountstr + ':'
+                        elif colcount == 0:
+                            colfix = ':' + colcountstr + ':'
                         else:
-                            await client.send_message(message.channel, 'Please check message parameters [Stage not found].')
-                            return
-                    found_message = None
-                    found = '0'
-                    async for check in client.logs_from(vote):
-                        checkembed = check.embeds
-                        check_embed1 = None
-                        if len(checkembed) == 1:
-                            check_embed1 = checkembed[0]
-                            findfields = check_embed1['fields']
-                            for field in findfields:
-                                if (find_key in field['value']):
+                            colfix = colcountstr
+                        find_key = colfix
+                        post_status_temp = sep[3]
+                        post_status = post_status_temp.title()
+                        if post_status != 'Retired':
+                            post_stage_temp = sep[4]
+                            post_stage = ''
+                            if (post_stage_temp == '1') or (post_stage_temp == '2') or (post_stage_temp == '3') or (post_stage_temp == '4'):
+                                post_stage = post_stage_temp
+                            else:
+                                await client.send_message(message.channel, 'Please check message parameters [Stage not found].')
+                                return
+                        found_message = None
+                        found = '0'
+                        async for check in client.logs_from(vote):
+                            checkembed = check.embeds
+                            check_embed1 = None
+                            if len(checkembed) == 1:
+                                check_embed1 = checkembed[0]
+                                findfields = check_embed1['fields']
+                                for field in findfields:
+                                    if (find_key in field['value']):
+                                        found_message = check
+                                        found = '1'
+                                        break
+                            else:
+                                if (find_key in check.content) and ('$status' not in check.content) and (len(check.reactions)==2):
                                     found_message = check
                                     found = '1'
                                     break
-                        else:
-                            if (find_key in check.content) and ('$status' not in check.content) and (len(check.reactions)==2):
-                                found_message = check
-                                found = '1'
-                                break
-                    post_up = None
-                    post_down = None
-                    post_image = 'https://img.ifcdn.com/images/9871875b70ccd920395f799284902f3c4b3fd519f9c1c1000aa95dd4ab9f159b_1.jpg'
-                    post_note_add = 0
-                    if found == '1':
-                        '''found_embeds = found_message.attachments
-                        for tempembed in found_embeds:
-                            post_image = tempembed['url'] 
-                        post_reactions = found_message.reactions'''
-                        found_embeds_temp = found_message.embeds
-                        found_embeds = found_embeds_temp[0]
-                        post_image=found_embeds['image']['url']
-                        post_reactions = found_message.reactions
-                        if post_status != 'Retired':
-                            for tempreact in post_reactions:
-                                if tempreact.emoji == '👍':
-                                    post_up = tempreact.count
-                                elif tempreact.emoji == '👎':
-                                    post_down = tempreact.count
-                        if len(sep) >= 6:
-                            post_note_temp = sep[5:]
-                            post_note = ' '.join(post_note_temp)
-                            post_note_add = 1
-                        '''post_name_temp = []
-                        for postmem in found_message.mentions:
-                            post_name_temp.append(postmem.mention)
-                        post_name = ' '.join(post_name_temp)'''
-                        found_name = ''
-                        findname = found_embeds['fields']
-                        for field in findfields:
-                            if ('Submitted by:' in field['name']):
-                                found_name = field['value']
-                                break
-                        post_colour = discord.Colour.light_grey()
-                        if post_status == 'Approved':
-                            post_colour = discord.Colour.green()
-                        elif post_status == 'Rejected':
-                            post_colour = discord.Colour.red()
-                        elif post_status == 'Retired':
-                            post_colour = discord.Colour.red()
-                        elif post_status == 'Pending':
-                            post_colour = discord.Colour.gold()
-                        elif post_status == 'Global':
-                            post_colour = discord.Colour.purple()
-                        post = discord.Embed(colour = post_colour)
-                        post.set_image(url=post_image)
-                        post.set_author(name=message.author.name, icon_url=message.author.avatar_url)
-                        post.add_field(name='Emote Name: ', value = find_key, inline=True)
-                        if post_status != 'Retired':
-                            post.add_field(name='Status: ', value='**' + post_status + '** at stage ' + post_stage + ' (' + str(post_up) + ' 👍 - ' + str(post_down) + ' 👎)', inline=False)
-                            post.add_field(name='Submitted by: ', value = found_name, inline=True)
-                        else:
-                            post.add_field(name='Status: ', value=post_status, inline=False)
-                        post.timestamp = datetime.datetime.now()
-                        if post_note_add == 1:
-                            post.add_field(name='Moderator Note: ', value=post_note, inline=False)
-                        await client.send_message(stat, found_name, embed = post)
-                        await client.send_message(message.channel, 'Please confirm message deletion [Yes/No]')
-                        deletecheck = await client.wait_for_message(timeout= 300, author=message.author, channel=message.channel, check=delcheck)
-                        if deletecheck.content == 'yes' or deletecheck.content == 'Yes':
-                            await client.delete_message(found_message)
-                        if deletecheck.content == 'no' or deletecheck.content == 'No':
-                            return
-                    else: 
-                        await client.send_message(message.channel, 'Please check message parameters [Keyword not found].')
+                        post_up = None
+                        post_down = None
+                        post_image = 'https://img.ifcdn.com/images/9871875b70ccd920395f799284902f3c4b3fd519f9c1c1000aa95dd4ab9f159b_1.jpg'
+                        post_note_add = 0
+                        if found == '1':
+                            '''found_embeds = found_message.attachments
+                            for tempembed in found_embeds:
+                                post_image = tempembed['url'] 
+                            post_reactions = found_message.reactions'''
+                            found_embeds_temp = found_message.embeds
+                            found_embeds = found_embeds_temp[0]
+                            post_image=found_embeds['image']['url']
+                            post_reactions = found_message.reactions
+                            if post_status != 'Retired':
+                                for tempreact in post_reactions:
+                                    if tempreact.emoji == '👍':
+                                        post_up = tempreact.count
+                                    elif tempreact.emoji == '👎':
+                                        post_down = tempreact.count
+                            if len(sep) >= 6:
+                                post_note_temp = sep[5:]
+                                post_note = ' '.join(post_note_temp)
+                                post_note_add = 1
+                            '''post_name_temp = []
+                            for postmem in found_message.mentions:
+                                post_name_temp.append(postmem.mention)
+                            post_name = ' '.join(post_name_temp)'''
+                            found_name = ''
+                            findname = found_embeds['fields']
+                            for field in findfields:
+                                if ('Submitted by:' in field['name']):
+                                    found_name = field['value']
+                                    break
+                            post_colour = discord.Colour.light_grey()
+                            if post_status == 'Approved':
+                                post_colour = discord.Colour.green()
+                            elif post_status == 'Rejected':
+                                post_colour = discord.Colour.red()
+                            elif post_status == 'Retired':
+                                post_colour = discord.Colour.red()
+                            elif post_status == 'Pending':
+                                post_colour = discord.Colour.gold()
+                            elif post_status == 'Global':
+                                post_colour = discord.Colour.purple()
+                            post = discord.Embed(colour = post_colour)
+                            post.set_image(url=post_image)
+                            post.set_author(name=message.author.name, icon_url=message.author.avatar_url)
+                            post.add_field(name='Emote Name: ', value = find_key, inline=True)
+                            if post_status != 'Retired':
+                                post.add_field(name='Status: ', value='**' + post_status + '** at stage ' + post_stage + ' (' + str(post_up) + ' 👍 - ' + str(post_down) + ' 👎)', inline=False)
+                                post.add_field(name='Submitted by: ', value = found_name, inline=True)
+                            else:
+                                post.add_field(name='Status: ', value=post_status, inline=False)
+                            post.timestamp = datetime.datetime.now()
+                            if post_note_add == 1:
+                                post.add_field(name='Moderator Note: ', value=post_note, inline=False)
+                            await client.send_message(stat, found_name, embed = post)
+                            await client.send_message(message.channel, 'Please confirm message deletion [Yes/No]')
+                            deletecheck = await client.wait_for_message(timeout= 300, author=message.author, channel=message.channel, check=delcheck)
+                            if deletecheck.content == 'yes' or deletecheck.content == 'Yes':
+                                await client.delete_message(found_message)
+                            if deletecheck.content == 'no' or deletecheck.content == 'No':
+                                return
+                        else: 
+                            await client.send_message(message.channel, 'Please check message parameters [Keyword not found].')
                 elif sep[1] == 'delete':
                     colcountstr = sep[2]
                     colcount = colcountstr.count(':')
@@ -883,11 +920,117 @@ async def on_message(message):
                     try:
                         await client.add_reaction(x, '👍')
                     except:
-                    	print('owo')
+                        print('owo')
                     try:
                         await client.add_reaction(x, '👎')
                     except:
-                    	print('owo')
+                        print('owo')
+        elif message.content.startswith('$imgfix'):
+            vote = getvote()
+            parse = message.content
+            sep = parse.split()
+            '''if len(sep) == 1:
+                await client.send_message(message.channel, 'Command syntax is as follows: `$imgfix [emotename]` -- case sensitive')
+                await client.delete_message(message)
+                return'''
+            if len(sep) == 1:
+                '''colcountstr = sep[1]
+                colcount = colcountstr.count(':')
+                colfix = ''
+                if colcount != 2 and colcount != 0:
+                    colfix = colcountstr.replace(':', '')
+                    colfix = ':' + colcountstr + ':'
+                elif colcount == 0:
+                    colfix = ':' + colcountstr + ':'
+                else:
+                    colfix = colcountstr
+                find_key = colfix
+                found_message = None
+                found = '0'''
+                async for found_message in client.logs_from(vote, limit=112):
+                    if selfcheck(found_message.author) == True:
+                        '''checkembed = check.embeds
+                        check_embed1 = None
+                        if len(checkembed) == 1:
+                            check_embed1 = checkembed[0]
+                            findfields = check_embed1['fields']
+                            for field in findfields:
+                                if (find_key in field['value']):
+                                    found_message = check
+                                    found = '1'
+                                    break
+                        else:
+                            if (find_key in check.content) and ('$status' not in check.content) and (len(check.reactions)==2):
+                                found_message = check
+                                found = '1'
+                                break'''
+                #if found == '1':
+                        found_embeds_temp = found_message.embeds
+                        found_embeds = found_embeds_temp[0]
+                        post_image=found_embeds['image']['proxy_url']
+                        finalimage = await storeimage(post_image)
+                        await client.send_message(message.author, post_image + '\n' + finalimage)
+                        final_embed = discord.Embed.from_data(found_embeds)
+                        final_embed.set_image(url=finalimage)
+                        time.sleep(2)
+                        await client.edit_message(found_message, new_content = None, embed = final_embed)
+                await client.delete_message(message)
+                '''else:
+                    await client.send_message(message.channel, 'Search term `'+find_key+'` not found')
+                    await client.delete_message(message)
+                    return'''
+        elif message.content.startswith('$review'):
+            vote = getvote()
+            parse = message.content
+            sep = parse.split()
+            if len(sep) == 1:
+                await client.send_message(message.channel, 'Command syntax is as follows: `$review [emotename]` -- case sensitive')
+                await client.delete_message(message)
+                return
+            elif len(sep) == 2:
+                colcountstr = sep[1]
+                colcount = colcountstr.count(':')
+                colfix = ''
+                if colcount != 2 and colcount != 0:
+                    colfix = colcountstr.replace(':', '')
+                    colfix = ':' + colcountstr + ':'
+                elif colcount == 0:
+                    colfix = ':' + colcountstr + ':'
+                else:
+                    colfix = colcountstr
+                find_key = colfix
+                found_message = None
+                async for check in client.logs_from(vote):
+                    checkembed = check.embeds
+                    check_embed1 = None
+                    if len(checkembed) == 1:
+                        check_embed1 = checkembed[0]
+                        findfields = check_embed1['fields']
+                        for field in findfields:
+                            if (find_key in field['value']):
+                                found_message = check
+                                found = '1'
+                                break
+                    else:
+                        if (find_key in check.content) and ('$status' not in check.content) and (len(check.reactions)==2):
+                            found_message = check
+                            found = '1'
+                            break
+                if found == '1':
+                    found_embeds_temp = found_message.embeds
+                    found_embeds = found_embeds_temp[0]
+                    post_image = found_embeds['image']['url']
+                    final_embed = discord.Embed.from_data(found_embeds)
+                    final_embed.set_image(url = post_image)
+                    modvotemessage = await client.send_message(message.channel, embed = final_embed)
+                    time.sleep(0.5)
+                    await client.add_reaction(modvotemessage, '✅')
+                    time.sleep(0.5)
+                    await client.add_reaction(modvotemessage, '❌')
+                    await client.delete_message(message)
+                else:
+                    await client.send_message(message.channel, 'Search term `'+find_key+'` not found')
+                    return
         else:
             await client.send_message(message.channel, 'Invalid command.')
     elif (scheck == True) and (subtrue == True) and (emotesub == True) and (isitme == False):
