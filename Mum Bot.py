@@ -1000,7 +1000,8 @@ async def on_message(message):
                     colfix = colcountstr
                 find_key = colfix
                 found_message = None
-                async for check in client.logs_from(vote):
+                found = ''
+                async for check in client.logs_from(vote, limit=200):
                     checkembed = check.embeds
                     check_embed1 = None
                     if len(checkembed) == 1:
