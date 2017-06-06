@@ -1055,11 +1055,6 @@ async def on_message(message):
                 else:
                     await client.send_message(message.channel, 'Search term `'+find_key+'` not found')
                     return
-        '''elif message.content.startswith('$test'):
-            parse = message.content
-            split = parse.split()
-            finallink = await resizeimage(split[1], 30)
-            await client.send_message(message.channel, finallink)'''
         else:
             await client.send_message(message.channel, 'Invalid command.')
     elif (scheck == True) and (subtrue == True) and (emotesub == True) and (isitme == False):
