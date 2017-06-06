@@ -177,6 +177,19 @@ async def storeimage(link):
         print('Something went wrong when storing the image')
         return None
 
+async def resizeimage(link, size):
+    baselink = link
+    insert1 = baselink.find('/attachments')
+    split = list(baselink)
+    adjsize = '?width=' + str(size)
+    split.insert(insert1, '.rsz.io')
+    split.append(adjsize)
+    if 'https' in baselink:
+    	split.remove('s')
+    templink = ''.join(split)
+    finallink = await storeimage(templink)
+    return finallink
+
 @client.event
 async def on_ready():
     print('Logged in as')
@@ -833,9 +846,19 @@ async def on_message(message):
                 else:
                     await client.send_message(message.channel, 'Invalid command or input. Type `$feature` for command syntax.')
         elif message.content.startswith('$help'):
-            await client.send_message(message.channel, 'Available commands: ```$status - post a status update or edit a status update for an emote\n$feature - turn bot modules on/off\n$iloveyou - OK I ADMIT IT\n$purge - delete messages from a channel\n$settings - view roles and channels for this bot\n$modset - set the moderator role for this bot\n$voiceroleset - set the automatic voice role to be given\n$listen - add or remove a channel for the bot to listen to\n$subset - set the emote submission channel\n$modvoteset - set the moderator voting channel\n$voteset - set the user voting channel\n$statset - set the emote status channel```')
+            await client.send_message(message.channel, 'Available commands: ```$status - post a status update or edit a status update for an emote\n$feature - turn bot modules on/off\n$purge - delete messages from a channel\n$settings - view roles and channels for this bot\n$modset - set the moderator role for this bot\n$voiceroleset - set the automatic voice role to be given\n$listen - add or remove a channel for the bot to listen to\n$subset - set the emote submission channel\n$modvoteset - set the moderator voting channel\n$voteset - set the user voting channel\n$statset - set the emote status channel\n$memes - list of copypastas```')
         elif message.content.startswith('$iloveyou'):
             await client.send_message(message.channel, 'OK I ADMIT IT I LOVE YOU OK i fucking love you and it breaks my heart when i see you play with someone else or anyone commenting in your profile i just want to be your boyfriend and put a heart in my profile linking to your profile and have a walltext of you commenting cute things i want to play video games talk in discord all night and watch a movie together but you just seem so uninterested in me it fucking kills me and i cant take it anymore i want to remove you but i care too much about you so please i\'m begging you to either love me back or remove me and NEVER contact me again it hurts so much to say this because i need you by my side but if you don\'t love me then i want you to leave because seeing your icon in my friendlist would kill me everyday of my pathetic life')
+        elif message.content=='$bruce':
+            await client.send_message(message.channel, 'Hey its bruce from the lab. I just wanted to say that you\'re honestly the most beautiful girl I\'ve ever seen. I don\'t mean to be creepy or anything i just couldn\'t help myself from approaching u once i saw u talking to mike')
+        elif message.content.startswith('$bruce2'):
+            await client.send_message(message.channel, 'Hey its lab from the bruce. I just wanted to say that you\'re honestly the most ugly girl I\'ve ever seen. I don\'t mean to be amazing or anything i just couldn\'t help myself from approaching u once i saw u talking to mike')
+        elif message.content.startswith('$hands'):
+            await client.send_message(message.channel, 'Thanks bud, so kind\nYour hands were warm\nAnd very very tiny')
+        elif message.content.startswith('$lovely'):
+            await client.send_message(message.channel, 'My dearest long legged, lovely, picturesque treasure, how are you doing today? I\'m better now that you\'re here -- while you\'re still responding, do you want to grab a drink later? Get something to eat? Get married? The usual')    
+        elif message.content.startswith('$memes'):
+            await client.send_message(message.channel, '```$iloveyou\n$bruce\n$bruce2\n$hands\n$lovely```')
         elif message.content.startswith('$settings'):
             modobject = open('modid', 'rb')
             modroletemp = pickle.load(modobject)
@@ -1032,6 +1055,11 @@ async def on_message(message):
                 else:
                     await client.send_message(message.channel, 'Search term `'+find_key+'` not found')
                     return
+        '''elif message.content.startswith('$test'):
+            parse = message.content
+            split = parse.split()
+            finallink = await resizeimage(split[1], 30)
+            await client.send_message(message.channel, finallink)'''
         else:
             await client.send_message(message.channel, 'Invalid command.')
     elif (scheck == True) and (subtrue == True) and (emotesub == True) and (isitme == False):
@@ -1079,14 +1107,16 @@ async def on_message(message):
                     for tempembed in found_embeds:
                         temp_image = tempembed['url']
                     print(temp_image)
-                    post_image = await storeimage(temp_image)
-                    if post_image != '':
+                    post_image1 = await storeimage(temp_image)
+                    if post_image1 != '':
                         iwidth = ''
                         iheight = ''
                         for tempembed in found_embeds:
                             iwidth = tempembed['width']
                             iheight = tempembed['height']
-                        if (iwidth == 112) and (iheight == 112) and ('.png' in post_image):
+                        if (iwidth == 112) and (iheight == 112) and ('.png' in post_image1):
+                            size = 35
+                            post_image = await resizeimage(post_image1, size)
                             sendmedaddy = getmodvote()
                             post = discord.Embed(colour = discord.Colour.teal(), type='rich')
                             post.add_field(name='Emote Name: ', value = sep[0], inline=True)
@@ -1123,6 +1153,16 @@ async def on_message(message):
         await client.send_message(message.author, 'You cannot use commands in DMs.')
     elif message.content.startswith('$iloveyou') and mcheck == True:
         await client.send_message(message.channel, 'OK I ADMIT IT I LOVE YOU OK i fucking love you and it breaks my heart when i see you play with someone else or anyone commenting in your profile i just want to be your boyfriend and put a heart in my profile linking to your profile and have a walltext of you commenting cute things i want to play video games talk in discord all night and watch a movie together but you just seem so uninterested in me it fucking kills me and i cant take it anymore i want to remove you but i care too much about you so please i\'m begging you to either love me back or remove me and NEVER contact me again it hurts so much to say this because i need you by my side but if you don\'t love me then i want you to leave because seeing your icon in my friendlist would kill me everyday of my pathetic life')
+    elif message.content=='$bruce' and mcheck == True:
+        await client.send_message(message.channel, 'Hey its bruce from the lab. I just wanted to say that you\'re honestly the most beautiful girl I\'ve ever seen. I don\'t mean to be creepy or anything i just couldn\'t help myself from approaching u once i saw u talking to mike')
+    elif message.content.startswith('$bruce2') and mcheck == True:
+        await client.send_message(message.channel, 'Hey its lab from the bruce. I just wanted to say that you\'re honestly the most ugly girl I\'ve ever seen. I don\'t mean to be amazing or anything i just couldn\'t help myself from approaching u once i saw u talking to mike')
+    elif message.content.startswith('$hands') and mcheck == True:
+        await client.send_message(message.channel, 'Thanks bud, so kind\nYour hands were warm\nAnd very very tiny')
+    elif message.content.startswith('$lovely') and mcheck == True:
+        await client.send_message(message.channel, 'My dearest long legged, lovely, picturesque treasure, how are you doing today? I\'m better now that you\'re here -- while you\'re still responding, do you want to grab a drink later? Get something to eat? Get married? The usual')    
+    elif message.content.startswith('$memes') and mcheck == True:
+        await client.send_message(message.channel, '```$iloveyou\n$bruce\n$bruce2\n$hands\n$lovely```')
     elif message.content.startswith('$purge') and mcheck == True:
         parse = message.content
         sep = parse.split()
