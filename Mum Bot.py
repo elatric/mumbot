@@ -355,12 +355,13 @@ async def on_message(message):
     isitme = selfcheck(message.author)
     megacheck = megarolecheck(message.author)
     if message.mention_everyone == True and ccheck == False:
-        await client.send_message(message.channel, 'Mention detected! Shutting channel down :x:')
+        storechannel = client.get_channel('214249708711837696')
+        await client.send_message(storechannel, 'Mention detected. Shutting main channel down :x:')
         targetrole = discord.utils.get(message.author.server.roles, name='thonks')
         overwrite = discord.PermissionOverwrite()
         overwrite.send_messages = False
-        await client.edit_channel_permissions(message.channel, targetrole, overwrite)
-        await client.send_message(message.channel, 'Channel shut down. Please wait for an admin to address the situation')
+        await client.edit_channel_permissions(storechannel, targetrole, overwrite)
+        await client.send_message(storechannel, 'Channel shut down. Please wait for an admin to address the situation')
     elif (mcheck == True) and (scheck == True) and (ccheck == True) and (message.content.startswith('$')) and (isitme == False):
         if message.content.startswith('$status'):
             vote = getvote()
@@ -888,7 +889,7 @@ async def on_message(message):
                 else:
                     await client.send_message(message.channel, 'Invalid command or input. Type `$feature` for command syntax.')
         elif message.content.startswith('$help'):
-            await client.send_message(message.channel, 'Available commands: ```$status - post a status update or edit a status update for an emote\n$feature - turn bot modules on/off\n$purge - delete messages from a channel\n$settings - view roles and channels for this bot\n$modset - set the moderator role for this bot\n$voiceroleset - set the automatic voice role to be given\n$listen - add or remove a channel for the bot to listen to\n$subset - set the emote submission channel\n$modvoteset - set the moderator voting channel\n$voteset - set the user voting channel\n$statset - set the emote status channel\n$memes - list of copypastas\n$pmute - permanently mute a user```')
+            await client.send_message(message.channel, 'Available commands: ```$shutdown - shuts #mums_living_room down to the plebs\n$status - post a status update or edit a status update for an emote\n$feature - turn bot modules on/off\n$purge - delete messages from a channel\n$settings - view roles and channels for this bot\n$modset - set the moderator role for this bot\n$voiceroleset - set the automatic voice role to be given\n$listen - add or remove a channel for the bot to listen to\n$subset - set the emote submission channel\n$modvoteset - set the moderator voting channel\n$voteset - set the user voting channel\n$statset - set the emote status channel\n$memes - list of copypastas\n$pmute - permanently mute a user```')
         elif message.content.startswith('$iloveyou'):
             await client.send_message(message.channel, 'OK I ADMIT IT I LOVE YOU OK i fucking love you and it breaks my heart when i see you play with someone else or anyone commenting in your profile i just want to be your boyfriend and put a heart in my profile linking to your profile and have a walltext of you commenting cute things i want to play video games talk in discord all night and watch a movie together but you just seem so uninterested in me it fucking kills me and i cant take it anymore i want to remove you but i care too much about you so please i\'m begging you to either love me back or remove me and NEVER contact me again it hurts so much to say this because i need you by my side but if you don\'t love me then i want you to leave because seeing your icon in my friendlist would kill me everyday of my pathetic life')
         elif message.content=='$bruce':
@@ -1121,6 +1122,14 @@ async def on_message(message):
                     await client.send_message(message.channel, 'Users ' + ', '.join(mutelist) + ' have been permanently muted')
             else:
                 await client.send_message(message.channel, 'Command syntax is as follows: `$pmute [@user1] [@user2]` and so on for each user')
+        elif message.content.startswith('$shutdown'):
+            storechannel = client.get_channel('214249708711837696')
+            await client.send_message(storechannel, 'Raid or mention detected. Shutting main channel down :x:')
+            targetrole = discord.utils.get(message.author.server.roles, name='thonks')
+            overwrite = discord.PermissionOverwrite()
+            overwrite.send_messages = False
+            await client.edit_channel_permissions(storechannel, targetrole, overwrite)
+            await client.send_message(storechannel, 'Channel shut down. Please wait for an admin to address the situation')
         else:
             await client.send_message(message.channel, 'Invalid command.')
     elif (scheck == True) and (subtrue == True) and (emotesub == True) and (isitme == False):
@@ -1267,6 +1276,14 @@ async def on_message(message):
             await client.send_message(message.channel, 'Command syntax is as follows: `$purge [# of messages to purge]` -- number must be >= 2')
         else:
             await client.send_message(message.channel, 'Invalid input! Type `$purge` for command syntax')
+    elif message.content.startswith('$shutdown') and mcheck == True:
+        storechannel = client.get_channel('214249708711837696')
+        await client.send_message(storechannel, 'Raid or mention detected. Shutting main channel down :x:')
+        targetrole = discord.utils.get(message.author.server.roles, name='thonks')
+        overwrite = discord.PermissionOverwrite()
+        overwrite.send_messages = False
+        await client.edit_channel_permissions(storechannel, targetrole, overwrite)
+        await client.send_message(storechannel, 'Channel shut down. Please wait for an admin to address the situation')
     elif message.content.startswith('$') and mcheck == False and isitme == False and ccheck == True:
         await client.send_message(message.channel, 'You do not have permission to use this command.')
 
