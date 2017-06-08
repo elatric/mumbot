@@ -38,7 +38,7 @@ def modcheck(user):
     else:
         return True
 
-def megacheck(user):
+def megarolecheck(user):
     server = client.get_server('214249708711837696')
     modobject = open('megaid', 'rb')
     modrole = pickle.load(modobject)
@@ -353,7 +353,15 @@ async def on_message(message):
     emotesub = emotesubonoff()
     subtrue = subcheck(message)
     isitme = selfcheck(message.author)
-    if (mcheck == True) and (scheck == True) and (ccheck == True) and (message.content.startswith('$')) and (isitme == False):
+    megacheck = megarolecheck(message.author)
+    if message.mention_everyone == True and ccheck == False:
+        await client.send_message(message.channel, 'Mention detected! Shutting channel down :x:')
+        targetrole = discord.utils.get(message.author.server.roles, name='thonks')
+        overwrite = discord.PermissionOverwrite()
+        overwrite.send_messages = False
+        await client.edit_channel_permissions(message.channel, targetrole, overwrite)
+        await client.send_message(message.channel, 'Channel shut down. Please wait for an admin to address the situation')
+    elif (mcheck == True) and (scheck == True) and (ccheck == True) and (message.content.startswith('$')) and (isitme == False):
         if message.content.startswith('$status'):
             vote = getvote()
             stat = getstat()
@@ -1205,8 +1213,6 @@ async def on_message(message):
     elif message.server == None and message.content.startswith('$') and isitme == False:
         await client.send_message(message.author, 'You cannot use commands in DMs.')
     elif message.content.startswith('$pmute') and isitme == False:
-        usercheck = megacheck(message.author)
-        usercheck = True
         if usercheck == True:
             parse = message.content
             sep = parse.split()
@@ -1227,21 +1233,21 @@ async def on_message(message):
                     await client.send_message(message.channel, 'Users ' + ', '.join(mutelist) + ' have been permanently muted')
             else:
                 await client.send_message(message.channel, 'Command syntax is as follows: `$pmute [@user1] [@user2]` and so on for each user')
-    elif message.content.startswith('$iloveyou') and mcheck == True:
+    elif message.content.startswith('$iloveyou') and megacheck == True:
         await client.send_message(message.channel, 'OK I ADMIT IT I LOVE YOU OK i fucking love you and it breaks my heart when i see you play with someone else or anyone commenting in your profile i just want to be your boyfriend and put a heart in my profile linking to your profile and have a walltext of you commenting cute things i want to play video games talk in discord all night and watch a movie together but you just seem so uninterested in me it fucking kills me and i cant take it anymore i want to remove you but i care too much about you so please i\'m begging you to either love me back or remove me and NEVER contact me again it hurts so much to say this because i need you by my side but if you don\'t love me then i want you to leave because seeing your icon in my friendlist would kill me everyday of my pathetic life')
-    elif message.content=='$bruce' and mcheck == True:
+    elif message.content=='$bruce' and megacheck == True:
         await client.send_message(message.channel, 'Hey its bruce from the lab. I just wanted to say that you\'re honestly the most beautiful girl I\'ve ever seen. I don\'t mean to be creepy or anything i just couldn\'t help myself from approaching u once i saw u talking to mike')
-    elif message.content.startswith('$bruce2') and mcheck == True:
+    elif message.content.startswith('$bruce2') and megacheck == True:
         await client.send_message(message.channel, 'Hey its lab from the bruce. I just wanted to say that you\'re honestly the most ugly girl I\'ve ever seen. I don\'t mean to be amazing or anything i just couldn\'t help myself from approaching u once i saw u talking to mike')
-    elif message.content.startswith('$hands') and mcheck == True:
+    elif message.content.startswith('$hands') and megacheck == True:
         await client.send_message(message.channel, 'Thanks bud, so kind\nYour hands were warm\nAnd very very tiny')
-    elif message.content.startswith('$lovely') and mcheck == True:
+    elif message.content.startswith('$lovely') and megacheck == True:
         await client.send_message(message.channel, 'My dearest long legged, lovely, picturesque treasure, how are you doing today? I\'m better now that you\'re here -- while you\'re still responding, do you want to grab a drink later? Get something to eat? Get married? The usual')    
-    elif message.content.startswith('$confess') and mcheck == True:
+    elif message.content.startswith('$confess') and megacheck == True:
         await client.send_message(message.channel, 'Your such a fucking bitch honestly you told me to confess and now your turning me down why does anyone like you I hope you take your ugly face and cut it open')
-    elif message.content.startswith('$roar') and mcheck == True:
+    elif message.content.startswith('$roar') and megacheck == True:
         await client.send_message(message.channel, '`ROAR MOTHER FUCKER`')
-    elif message.content.startswith('$memes') and mcheck == True:
+    elif message.content.startswith('$memes') and megacheck == True:
         await client.send_message(message.channel, '```$iloveyou\n$bruce\n$bruce2\n$hands\n$lovely\n$confess\n$roar```')
     elif message.content.startswith('$purge') and mcheck == True:
         parse = message.content
