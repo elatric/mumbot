@@ -37,6 +37,27 @@ def modcheck(user):
         return True
     else:
         return True
+
+def megacheck(user):
+    server = client.get_server('214249708711837696')
+    modobject = open('megaid', 'rb')
+    modrole = pickle.load(modobject)
+    userid = user.id
+    member = server.get_member(userid) 
+    checkrole = member.roles
+    modtrue = 0
+    modobject.close()
+    for role in checkrole:
+        if role.id == modrole:
+            modtrue = 1
+            break
+    if modtrue == 0:
+        return False
+    elif modtrue ==0 and userid == '119815473750736899':
+        return True
+    else:
+        return True
+
 def getvote():
     voteobject = open('voteid', 'rb')
     voteidtemp = pickle.load(voteobject)
@@ -185,7 +206,7 @@ async def resizeimage(link, size):
     split.insert(insert1, '.rsz.io')
     split.append(adjsize)
     if 'https' in baselink:
-    	split.remove('s')
+        split.remove('s')
     templink = ''.join(split)
     finallink = await storeimage(templink)
     return finallink
@@ -681,6 +702,19 @@ async def on_message(message):
                 pickle.dump(finalid, modobject)
                 modobject.close()
                 await client.send_message(message.channel, 'Base modrole set as {}' .format(finalid))
+        elif message.content.startswith('$megaset'):
+            temp = message.content
+            sepmod = temp.split()
+            if len(sepmod) == 1:
+                await client.send_message(message.channel, 'The syntax for this command is as follows: `$megaset @megathinkrole`')
+            else:
+                modstr = sepmod[1]
+                finalid1 = modstr.replace('<@&', '')
+                finalid = finalid1.replace('>', '')
+                modobject = open('megaid', 'wb')
+                pickle.dump(finalid, modobject)
+                modobject.close()
+                await client.send_message(message.channel, 'Megathink role set as {}' .format(finalid))
         elif message.content.startswith('$voiceroleset'):
             temp = message.content
             sep = temp.split()
@@ -846,7 +880,7 @@ async def on_message(message):
                 else:
                     await client.send_message(message.channel, 'Invalid command or input. Type `$feature` for command syntax.')
         elif message.content.startswith('$help'):
-            await client.send_message(message.channel, 'Available commands: ```$status - post a status update or edit a status update for an emote\n$feature - turn bot modules on/off\n$purge - delete messages from a channel\n$settings - view roles and channels for this bot\n$modset - set the moderator role for this bot\n$voiceroleset - set the automatic voice role to be given\n$listen - add or remove a channel for the bot to listen to\n$subset - set the emote submission channel\n$modvoteset - set the moderator voting channel\n$voteset - set the user voting channel\n$statset - set the emote status channel\n$memes - list of copypastas```')
+            await client.send_message(message.channel, 'Available commands: ```$status - post a status update or edit a status update for an emote\n$feature - turn bot modules on/off\n$purge - delete messages from a channel\n$settings - view roles and channels for this bot\n$modset - set the moderator role for this bot\n$voiceroleset - set the automatic voice role to be given\n$listen - add or remove a channel for the bot to listen to\n$subset - set the emote submission channel\n$modvoteset - set the moderator voting channel\n$voteset - set the user voting channel\n$statset - set the emote status channel\n$memes - list of copypastas\n$pmute - permanently mute a user```')
         elif message.content.startswith('$iloveyou'):
             await client.send_message(message.channel, 'OK I ADMIT IT I LOVE YOU OK i fucking love you and it breaks my heart when i see you play with someone else or anyone commenting in your profile i just want to be your boyfriend and put a heart in my profile linking to your profile and have a walltext of you commenting cute things i want to play video games talk in discord all night and watch a movie together but you just seem so uninterested in me it fucking kills me and i cant take it anymore i want to remove you but i care too much about you so please i\'m begging you to either love me back or remove me and NEVER contact me again it hurts so much to say this because i need you by my side but if you don\'t love me then i want you to leave because seeing your icon in my friendlist would kill me everyday of my pathetic life')
         elif message.content=='$bruce':
@@ -1055,6 +1089,26 @@ async def on_message(message):
                 else:
                     await client.send_message(message.channel, 'Search term `'+find_key+'` not found')
                     return
+        elif message.content.startswith('$pmute'):
+            parse = message.content
+            sep = parse.split()
+            server = client.get_server('214249708711837696')
+            muterole = discord.utils.get(message.author.server.roles, id='303319098430062602')
+            if len(sep) != 1:
+                userlist = message.mentions
+                mutelist = []
+                for user in userlist:
+                    try:
+                        await client.add_roles(user, muterole)
+                        mutelist.append(user.mention)
+                    except:
+                        await client.send_message(message.channel, 'User ' + user.mention + ' is already muted')
+                if len(mutelist) == 1:
+                    await client.send_message(message.channel, 'User ' + ''.join(mutelist) + ' has been permanently muted')
+                else:
+                    await client.send_message(message.channel, 'Users ' + ', '.join(mutelist) + ' have been permanently muted')
+            else:
+                await client.send_message(message.channel, 'Command syntax is as follows: `$pmute [@user1] [@user2]` and so on for each user')
         else:
             await client.send_message(message.channel, 'Invalid command.')
     elif (scheck == True) and (subtrue == True) and (emotesub == True) and (isitme == False):
@@ -1146,6 +1200,29 @@ async def on_message(message):
                         return
     elif message.server == None and message.content.startswith('$') and isitme == False:
         await client.send_message(message.author, 'You cannot use commands in DMs.')
+    elif message.content.startswith('$pmute') and isitme == False:
+        usercheck = megacheck(message.author)
+        usercheck = True
+        if usercheck == True:
+            parse = message.content
+            sep = parse.split()
+            server = client.get_server('214249708711837696')
+            muterole = discord.utils.get(message.author.server.roles, id='303319098430062602')
+            if len(sep) != 1:
+                userlist = message.mentions
+                mutelist = []
+                for user in userlist:
+                    try:
+                        await client.add_roles(user, muterole)
+                        mutelist.append(user.mention)
+                    except:
+                        await client.send_message(message.channel, 'User ' + user.mention + ' is already muted')
+                if len(mutelist) == 1:
+                    await client.send_message(message.channel, 'User ' + ''.join(mutelist) + ' has been permanently muted')
+                else:
+                    await client.send_message(message.channel, 'Users ' + ', '.join(mutelist) + ' have been permanently muted')
+            else:
+                await client.send_message(message.channel, 'Command syntax is as follows: `$pmute [@user1] [@user2]` and so on for each user')
     elif message.content.startswith('$iloveyou') and mcheck == True:
         await client.send_message(message.channel, 'OK I ADMIT IT I LOVE YOU OK i fucking love you and it breaks my heart when i see you play with someone else or anyone commenting in your profile i just want to be your boyfriend and put a heart in my profile linking to your profile and have a walltext of you commenting cute things i want to play video games talk in discord all night and watch a movie together but you just seem so uninterested in me it fucking kills me and i cant take it anymore i want to remove you but i care too much about you so please i\'m begging you to either love me back or remove me and NEVER contact me again it hurts so much to say this because i need you by my side but if you don\'t love me then i want you to leave because seeing your icon in my friendlist would kill me everyday of my pathetic life')
     elif message.content=='$bruce' and mcheck == True:
