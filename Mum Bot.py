@@ -891,8 +891,12 @@ async def on_message(message):
             await client.send_message(message.channel, 'Thanks bud, so kind\nYour hands were warm\nAnd very very tiny')
         elif message.content.startswith('$lovely'):
             await client.send_message(message.channel, 'My dearest long legged, lovely, picturesque treasure, how are you doing today? I\'m better now that you\'re here -- while you\'re still responding, do you want to grab a drink later? Get something to eat? Get married? The usual')    
+        elif message.content.startswith('$confess'):
+            await client.send_message(message.channel, 'Your such a fucking bitch honestly you told me to confess and now your turning me down why does anyone like you I hope you take your ugly face and cut it open')
+        elif message.content.startswith('$roar'):
+            await client.send_message(message.channel, '`ROAR MOTHER FUCKER`')
         elif message.content.startswith('$memes'):
-            await client.send_message(message.channel, '```$iloveyou\n$bruce\n$bruce2\n$hands\n$lovely```')
+            await client.send_message(message.channel, '```$iloveyou\n$bruce\n$bruce2\n$hands\n$lovely\n$confess\n$roar```')
         elif message.content.startswith('$settings'):
             modobject = open('modid', 'rb')
             modroletemp = pickle.load(modobject)
@@ -1233,8 +1237,12 @@ async def on_message(message):
         await client.send_message(message.channel, 'Thanks bud, so kind\nYour hands were warm\nAnd very very tiny')
     elif message.content.startswith('$lovely') and mcheck == True:
         await client.send_message(message.channel, 'My dearest long legged, lovely, picturesque treasure, how are you doing today? I\'m better now that you\'re here -- while you\'re still responding, do you want to grab a drink later? Get something to eat? Get married? The usual')    
+    elif message.content.startswith('$confess') and mcheck == True:
+        await client.send_message(message.channel, 'Your such a fucking bitch honestly you told me to confess and now your turning me down why does anyone like you I hope you take your ugly face and cut it open')
+    elif message.content.startswith('$roar') and mcheck == True:
+        await client.send_message(message.channel, '`ROAR MOTHER FUCKER`')
     elif message.content.startswith('$memes') and mcheck == True:
-        await client.send_message(message.channel, '```$iloveyou\n$bruce\n$bruce2\n$hands\n$lovely```')
+        await client.send_message(message.channel, '```$iloveyou\n$bruce\n$bruce2\n$hands\n$lovely\n$confess\n$roar```')
     elif message.content.startswith('$purge') and mcheck == True:
         parse = message.content
         sep = parse.split()
