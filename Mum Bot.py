@@ -1222,7 +1222,7 @@ async def on_message(message):
     elif message.server == None and message.content.startswith('$') and isitme == False:
         await client.send_message(message.author, 'You cannot use commands in DMs.')
     elif message.content.startswith('$pmute') and isitme == False:
-        if usercheck == True:
+        if megacheck == True:
             parse = message.content
             sep = parse.split()
             server = client.get_server('214249708711837696')
