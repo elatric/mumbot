@@ -238,6 +238,7 @@ async def on_reaction_add(reaction, user):
     isitme = selfcheck(user)
     mvchannel = getmodvote()
     emotesub = emotesubonoff()
+    ccheck = channelcheck(reaction.message)
     mvtrue = False
     found_embeds_temp = reaction.message.embeds
     if mvchannel.id == reaction.message.channel.id:
@@ -343,6 +344,13 @@ async def on_reaction_add(reaction, user):
             votepost.add_field(name='Submitted by: ', value = saveauthor.mention, inline=True)
             votepost.timestamp = datetime.datetime.now()
             publicvotemessage = await client.send_message(vote, embed = votepost)
+            await client.add_reaction(publicvotemessage, '👍')
+            await client.add_reaction(publicvotemessage, '👎')
+            await client.delete_message(reaction.message)
+    if (scheck == True) and (mcheck == True) and (ccheck == True) and (isitme == False):
+        dcheck = reaction.emoji
+        if reaction.message.author.id=='204255221017214977' and dcheck == '✅' and ('Reported' in reaction.message.content):
+            await client.send_message(reaction.message.channel, '```' + reaction.message.content+'``` Handled by: ' + user.name)
             await client.delete_message(reaction.message)
 
 @client.event
@@ -357,6 +365,7 @@ async def on_message(message):
     if message.mention_everyone == True and ccheck == False:
         storechannel = client.get_channel('214249708711837696')
         await client.send_message(storechannel, 'Mention detected. Shutting main channel down :x:')
+        await client.send_message(storechannel, '-logs')
         targetrole = discord.utils.get(message.author.server.roles, name='thonks')
         overwrite = discord.PermissionOverwrite()
         overwrite.send_messages = False
@@ -374,10 +383,10 @@ async def on_message(message):
                 if sep[1] == 'set':
                     if sep[2] == 'Massreject' and len(sep) == 4:
                         print('Running Massreject')
-                        async for found_message in client.logs_from(vote, limit=sep[3]):
+                        async for found_message in client.logs_from(vote, limit=int(sep[3])):
                             if selfcheck(found_message.author) == True:
                                 post_status = 'Rejected'
-                                post_stage = '3'
+                                post_stage = '2'
                                 post_up = None
                                 post_down = None
                                 post_reactions = found_message.reactions
@@ -431,7 +440,7 @@ async def on_message(message):
                                 return
                         found_message = None
                         found = '0'
-                        async for check in client.logs_from(vote):
+                        async for check in client.logs_from(vote, limit=200):
                             checkembed = check.embeds
                             check_embed1 = None
                             if len(checkembed) == 1:
@@ -476,7 +485,8 @@ async def on_message(message):
                             post_name = ' '.join(post_name_temp)'''
                             found_name = ''
                             findname = found_embeds['fields']
-                            for field in findfields:
+                            print(findname)
+                            for field in findname:
                                 if ('Submitted by:' in field['name']):
                                     found_name = field['value']
                                     break
@@ -504,11 +514,16 @@ async def on_message(message):
                             if post_note_add == 1:
                                 post.add_field(name='Moderator Note: ', value=post_note, inline=False)
                             await client.send_message(stat, found_name, embed = post)
-                            await client.send_message(message.channel, 'Please confirm message deletion [Yes/No]')
+                            deleteme = await client.send_message(message.channel, 'Please confirm message deletion [Yes/No]')
                             deletecheck = await client.wait_for_message(timeout= 300, author=message.author, channel=message.channel, check=delcheck)
                             if deletecheck.content == 'yes' or deletecheck.content == 'Yes':
                                 await client.delete_message(found_message)
+                                await client.delete_message(deleteme)
+                                await client.delete_message(deletecheck)
+                                return
                             if deletecheck.content == 'no' or deletecheck.content == 'No':
+                                await client.delete_message(deleteme)
+                                await client.delete_message(deletecheck)
                                 return
                         else: 
                             await client.send_message(message.channel, 'Please check message parameters [Keyword not found].')
@@ -1124,6 +1139,7 @@ async def on_message(message):
                 await client.send_message(message.channel, 'Command syntax is as follows: `$pmute [@user1] [@user2]` and so on for each user')
         elif message.content.startswith('$shutdown'):
             storechannel = client.get_channel('214249708711837696')
+            await client.send_message(storechannel, '-logs')
             await client.send_message(storechannel, 'Raid or mention detected. Shutting main channel down :x:')
             targetrole = discord.utils.get(message.author.server.roles, name='thonks')
             overwrite = discord.PermissionOverwrite()
@@ -1133,7 +1149,7 @@ async def on_message(message):
         else:
             await client.send_message(message.channel, 'Invalid command.')
     elif (scheck == True) and (subtrue == True) and (emotesub == True) and (isitme == False):
-        time.sleep(2)
+        time.sleep(1)
         try: 
             message 
         except:
@@ -1185,7 +1201,7 @@ async def on_message(message):
                             iwidth = tempembed['width']
                             iheight = tempembed['height']
                         if (iwidth == 112) and (iheight == 112) and ('.png' in post_image1):
-                            size = 35
+                            size = 30
                             post_image = await resizeimage(post_image1, size)
                             sendmedaddy = getmodvote()
                             post = discord.Embed(colour = discord.Colour.teal(), type='rich')
@@ -1278,12 +1294,15 @@ async def on_message(message):
             await client.send_message(message.channel, 'Invalid input! Type `$purge` for command syntax')
     elif message.content.startswith('$shutdown') and mcheck == True:
         storechannel = client.get_channel('214249708711837696')
+        await client.send_message(storechannel, '-logs')
         await client.send_message(storechannel, 'Raid or mention detected. Shutting main channel down :x:')
         targetrole = discord.utils.get(message.author.server.roles, name='thonks')
         overwrite = discord.PermissionOverwrite()
         overwrite.send_messages = False
         await client.edit_channel_permissions(storechannel, targetrole, overwrite)
         await client.send_message(storechannel, 'Channel shut down. Please wait for an admin to address the situation')
+    elif message.author.id=='204255221017214977' and ccheck==True and ('Reported' in message.content):
+        await client.add_reaction(message, '✅')
     elif message.content.startswith('$') and mcheck == False and isitme == False and ccheck == True:
         await client.send_message(message.channel, 'You do not have permission to use this command.')
 
