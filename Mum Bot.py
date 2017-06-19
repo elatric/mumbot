@@ -8,13 +8,15 @@ import logging
 import urllib.request
 import sys
 import wget
-import urllib.request
+import socket
 
 logger = logging.getLogger('discord')
 logger.setLevel(logging.WARNING)
 handler = logging.FileHandler(filename='discord.log', encoding='utf-8', mode='w')
 handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
 logger.addHandler(handler)
+
+socket.setdefaulttimeout(45)
 
 client = discord.Client()
 
@@ -85,6 +87,19 @@ def getmodvote():
     modid = client.get_channel(modvotetemp)
     modvoteobject.close()
     return modid
+
+def getstarid():
+    staridobject = open('starid', 'rb')
+    staridtemp = pickle.load(staridobject)
+    starid = client.get_channel(staridtemp)
+    staridobject.close()
+    return starid
+
+def getstarnum():
+    starnumobject = open('starnum', 'rb')
+    starnumtemp = pickle.load(starnumobject)
+    starnum = int(starnumtemp)
+    return starnum
 
 def servercheck(message):
     testid = '305782987893768202'
@@ -247,7 +262,7 @@ async def on_reaction_add(reaction, user):
     found_embeds_temp = reaction.message.embeds
     if mvchannel.id == reaction.message.channel.id:
         mvtrue = True
-    if (scheck == True) and (mcheck == True) and (mvtrue == True) and (isitme == False) and (emotesub == True) and (len(found_embeds_temp) != 0):
+    if (scheck == True) and (mcheck == True) and (mvtrue == True) and (isitme == False) and (emotesub == True) and (len(found_embeds_temp) != 0) and ((reaction.emoji == '❌') or (reaction.emoji == '✅')):
         server = client.get_server('214249708711837696')
         livingroom = client.get_channel('214249708711837696')
         verdict = reaction.emoji
@@ -351,11 +366,39 @@ async def on_reaction_add(reaction, user):
             await client.add_reaction(publicvotemessage, '👍')
             await client.add_reaction(publicvotemessage, '👎')
             await client.delete_message(reaction.message)
-    if (scheck == True) and (mcheck == True) and (ccheck == True) and (isitme == False):
+    elif (scheck == True) and (mcheck == True) and (ccheck == True) and (isitme == False) and (reaction.emoji=='✅'):
         dcheck = reaction.emoji
-        if reaction.message.author.id=='204255221017214977' and dcheck == '✅' and ('Reported' in reaction.message.content):
+        if reaction.message.author.id=='204255221017214977' and ('Reported' in reaction.message.content):
             await client.send_message(reaction.message.channel, '**Report:**\n' + reaction.message.content+'\n**Handled by:** ' + user.name)
             await client.delete_message(reaction.message)
+    elif (scheck==True) and (reaction.emoji == '⭐'):
+        post_reactions = reaction.message.reactions
+        starnumbase = getstarnum()
+        starnum = 0
+        for tempreact in post_reactions:
+            if tempreact.emoji == '⭐':
+                starnum = tempreact.count
+        if starnum == starnumbase:
+            starchan = getstarid()
+            async for found_message in client.logs_from(starchan, limit=50):
+                if reaction.message.id in found_message.content:
+                    return 
+            post_colour = discord.Colour.gold()
+            post = discord.Embed(colour = post_colour, description = reaction.message.content)
+            nameme = reaction.message.author.name + '#' + reaction.message.author.discriminator
+            post.set_author(name=nameme, icon_url=reaction.message.author.avatar_url)
+            post.timestamp = datetime.datetime.now()
+            found_embeds = reaction.message.attachments
+            post_image = None
+            if len(found_embeds) != 0:
+                for tempembed in found_embeds:
+                    post_image = tempembed['url']
+                try:
+                    post.set_image(url=post_image)
+                except:
+                    print('I tried')
+            info = '⭐ ' + reaction.message.channel.mention + ' ID: ' + reaction.message.id
+            await client.send_message(starchan, info, embed = post)
 
 @client.event
 async def on_message(message):
@@ -1153,6 +1196,29 @@ async def on_message(message):
             overwrite.send_messages = False
             await client.edit_channel_permissions(storechannel, targetrole, overwrite)
             await client.send_message(storechannel, 'Channel shut down. Please wait for an admin to address the situation')
+        elif message.content.startswith('$starboard'):
+            parse = message.content
+            sep = parse.split()
+            if len(sep) == 1:
+                await client.send_message(message.channel, 'Command syntax is as follows: `$starboard [set/num] [channel/minimum stars]`')
+                return
+            else:
+                if sep[1] == 'Set' or sep[1] == 'set':
+                    channel = sep[2]
+                    finalid1 = channel.replace('<#', '')
+                    starid = finalid1.replace('>', '')
+                    starobject = open('starid', 'wb')
+                    pickle.dump(starid, starobject)
+                    starobject.close()
+                    await client.send_message(message.channel, 'Starboard channel set as `'+starid+'`')
+                    return
+                elif sep[1] == 'num' or sep[1] == 'Num':
+                    starnum = sep[2]
+                    starobject = open('starnum', 'wb')
+                    pickle.dump(starnum, starobject)
+                    starobject.close()
+                    await client.send_message(message.channel, 'Minimum star number set as `'+starnum+'`')
+                    return
         else:
             await client.send_message(message.channel, 'Invalid command.')
     elif (scheck == True) and (subtrue == True) and (emotesub == True) and (isitme == False):
@@ -1202,8 +1268,8 @@ async def on_message(message):
                     print(temp_image)
                     post_image1 = await storeimage(temp_image)
                     if post_image1 == None:
-                    	await client.send_message(message.channel, 'Unable to store image.')
-                    	return
+                        await client.send_message(message.channel, 'Unable to store image.')
+                        return
                     if post_image1 != '':
                         iwidth = ''
                         iheight = ''
