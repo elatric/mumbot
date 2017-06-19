@@ -178,22 +178,26 @@ def addnote(message):
 
 async def storeimage(link):
     storechannel = client.get_channel('317835738458619904')
+    errorchannel = client.get_channel('305194878139367427')
     sendheader = tokenid
     if ('.com' in link) or ('.net' in link):
         opener = urllib.request.build_opener()
         opener.addheaders = [('User-Agent','Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_4) AppleWebKit/603.1.30 (KHTML, like Gecko) Version/10.1 Safari/603.1.30')]
         urllib.request.install_opener(opener)
-        filename, headers = urllib.request.urlretrieve(url=link)
-        #filename = wget.download(link)
-        os.rename(filename, filename + ".png")
-        newfilename = filename + '.png'
-        sendimage = open(os.path.abspath(newfilename), 'rb')
-        stored_image = await client.send_file(storechannel, newfilename, content=None)
-        sendimage.close()
-        found_embeds = stored_image.attachments
-        for tempembed in found_embeds:
-            post_image = tempembed['url'] 
-        return post_image
+        try:
+            filename, headers = urllib.request.urlretrieve(url=link)
+            os.rename(filename, filename + ".png")
+            newfilename = filename + '.png'
+            sendimage = open(os.path.abspath(newfilename), 'rb')
+            stored_image = await client.send_file(storechannel, newfilename, content=None)
+            sendimage.close()
+            found_embeds = stored_image.attachments
+            for tempembed in found_embeds:
+                post_image = tempembed['url'] 
+            return post_image
+        except:
+            await client.send_message(errorchannel, 'A problem occurred when trying to store image `'+link+'`')
+            return None
     else:
         print('Something went wrong when storing the image')
         return None
@@ -945,7 +949,7 @@ async def on_message(message):
                         try:
                             tempname = temprole.name
                         except:
-                        	print('N/A')
+                            print('N/A')
                         listenlist.append(tempname)
             else:
                 listenlist = 'None'
@@ -1197,6 +1201,9 @@ async def on_message(message):
                         temp_image = tempembed['url']
                     print(temp_image)
                     post_image1 = await storeimage(temp_image)
+                    if post_image1 == None:
+                    	await client.send_message(message.channel, 'Unable to store image.')
+                    	return
                     if post_image1 != '':
                         iwidth = ''
                         iheight = ''
