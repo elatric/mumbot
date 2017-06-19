@@ -182,7 +182,7 @@ async def storeimage(link):
     sendheader = tokenid
     if ('.com' in link) or ('.net' in link):
         opener = urllib.request.build_opener()
-        opener.addheaders = [('User-Agent','Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_4) AppleWebKit/603.1.30 (KHTML, like Gecko) Version/10.1 Safari/603.1.30')]
+        opener.addheaders = [('User-Agent','Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) Gecko/20100101 Firefox/47.0')]
         urllib.request.install_opener(opener)
         try:
             filename, headers = urllib.request.urlretrieve(url=link)
