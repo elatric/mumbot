@@ -371,7 +371,7 @@ async def on_reaction_add(reaction, user):
         if reaction.message.author.id=='204255221017214977' and ('Reported' in reaction.message.content):
             await client.send_message(reaction.message.channel, '**Report:**\n' + reaction.message.content+'\n**Handled by:** ' + user.name)
             await client.delete_message(reaction.message)
-    elif (scheck==True) and (reaction.emoji == '⭐'):
+    elif (scheck==True) and (reaction.emoji == '⭐') and (reaction.message.channel.id!='301798483525107712'):
         post_reactions = reaction.message.reactions
         starnumbase = getstarnum()
         starnum = 0
