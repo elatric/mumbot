@@ -375,10 +375,38 @@ async def on_reaction_add(reaction, user):
         post_reactions = reaction.message.reactions
         starnumbase = getstarnum()
         starnum = 0
+        starlist = []
         for tempreact in post_reactions:
             if tempreact.emoji == '⭐':
+                starlist = await client.get_reaction_users(tempreact, limit=5)
                 starnum = tempreact.count
-        if starnum == starnumbase:
+        modstar = 0
+        for reactor in starlist:
+            if reactor.id == '119815473750736899':
+                modstar = 1
+        if modstar == 1:
+            starchan = getstarid()
+            async for found_message in client.logs_from(starchan, limit=50):
+                if reaction.message.id in found_message.content:
+                    return 
+            post_colour = discord.Colour.gold()
+            post = discord.Embed(colour = post_colour, description = reaction.message.content)
+            nameme = reaction.message.author.name + '#' + reaction.message.author.discriminator
+            post.set_author(name=nameme, icon_url=reaction.message.author.avatar_url)
+            post.timestamp = datetime.datetime.now()
+            found_embeds = reaction.message.attachments
+            post_image = None
+            if len(found_embeds) != 0:
+                for tempembed in found_embeds:
+                    post_image = tempembed['url']
+                try:
+                    post.set_image(url=post_image)
+                except:
+                    print('I tried')
+            info = '⭐ ' + reaction.message.channel.mention + ' ID: ' + reaction.message.id
+            await client.send_message(starchan, info, embed = post)
+            return
+        elif starnum == starnumbase and modstar == 0:
             starchan = getstarid()
             async for found_message in client.logs_from(starchan, limit=50):
                 if reaction.message.id in found_message.content:
