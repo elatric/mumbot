@@ -350,7 +350,7 @@ async def on_reaction_add(reaction, user):
     if (scheck == True) and (mcheck == True) and (ccheck == True) and (isitme == False):
         dcheck = reaction.emoji
         if reaction.message.author.id=='204255221017214977' and dcheck == '✅' and ('Reported' in reaction.message.content):
-            await client.send_message(reaction.message.channel, '```' + reaction.message.content+'``` Handled by: ' + user.name)
+            await client.send_message(reaction.message.channel, '**Report:**\n' + reaction.message.content+'\n**Handled by:** ' + user.name)
             await client.delete_message(reaction.message)
 
 @client.event
@@ -916,7 +916,7 @@ async def on_message(message):
         elif message.content.startswith('$lovely'):
             await client.send_message(message.channel, 'My dearest long legged, lovely, picturesque treasure, how are you doing today? I\'m better now that you\'re here -- while you\'re still responding, do you want to grab a drink later? Get something to eat? Get married? The usual')    
         elif message.content.startswith('$confess'):
-            await client.send_message(message.channel, 'Your such a fucking bitch honestly you told me to confess and now your turning me down why does anyone like you I hope you take your ugly face and cut it open')
+            await client.send_message(message.channel, 'Your such a fucking bitch honestly you told me to confess and now your turning me down why does anyone like you I hope you take your ugly face and [redacted]')
         elif message.content.startswith('$roar'):
             await client.send_message(message.channel, '`ROAR MOTHER FUCKER`')
         elif message.content.startswith('$memes'):
@@ -942,7 +942,10 @@ async def on_message(message):
                 else: 
                     for tempid in listenid:
                         temprole = discord.utils.get(message.author.server.channels, id=tempid)
-                        tempname = temprole.name
+                        try:
+                            tempname = temprole.name
+                        except:
+                        	print('N/A')
                         listenlist.append(tempname)
             else:
                 listenlist = 'None'
@@ -1269,7 +1272,7 @@ async def on_message(message):
     elif message.content.startswith('$lovely') and megacheck == True:
         await client.send_message(message.channel, 'My dearest long legged, lovely, picturesque treasure, how are you doing today? I\'m better now that you\'re here -- while you\'re still responding, do you want to grab a drink later? Get something to eat? Get married? The usual')    
     elif message.content.startswith('$confess') and megacheck == True:
-        await client.send_message(message.channel, 'Your such a fucking bitch honestly you told me to confess and now your turning me down why does anyone like you I hope you take your ugly face and cut it open')
+        await client.send_message(message.channel, 'Your such a fucking bitch honestly you told me to confess and now your turning me down why does anyone like you I hope you take your ugly face and [redacted]')
     elif message.content.startswith('$roar') and megacheck == True:
         await client.send_message(message.channel, '`ROAR MOTHER FUCKER`')
     elif message.content.startswith('$memes') and megacheck == True:
