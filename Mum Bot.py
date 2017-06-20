@@ -1301,14 +1301,11 @@ async def on_message(message):
                     else:
                         post_image = ''
                         found_embeds = message.attachments
+                        temp_image = ''
                         for tempembed in found_embeds:
                             temp_image = tempembed['url']
-                        print(temp_image)
                         post_image1 = await storeimage(temp_image)
-                        if post_image1 == None:
-                            await client.send_message(message.channel, 'Unable to store image.')
-                            return
-                        if post_image1 != '':
+                        if temp_image != '':
                             iwidth = ''
                             iheight = ''
                             for tempembed in found_embeds:
