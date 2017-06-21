@@ -671,7 +671,6 @@ async def on_message(message):
                                 found_embed = None
                                 if len(embedlist) == 1:
                                     found_embed = embedlist[0]
-                                    print(found_embed)
                                 #name, image, author, status, note
                                 if sep[3] == 'name' or sep[3] == 'Name':
                                     await client.send_message(message.channel, 'Input the following: `Change [New name **in colons**]`')
@@ -1198,9 +1197,9 @@ async def on_message(message):
                         final_embed.set_image(url = post_image)
                         modvotemessage = await client.send_message(message.channel, embed = final_embed)
                         time.sleep(0.5)
-                        await client.add_reaction(modvotemessage, '✅')
+                        await client.add_reaction(modvotemessage, '👍')
                         time.sleep(0.5)
-                        await client.add_reaction(modvotemessage, '❌')
+                        await client.add_reaction(modvotemessage, '👎')
                         await client.delete_message(message)
                     else:
                         await client.send_message(message.channel, 'Search term `'+find_key+'` not found')
