@@ -177,6 +177,7 @@ def modvotecheck(reaction, user):
     emoji2 = e.startswith('✅')
     emoji3 = e.startswith('1⃣')
     emoji4 = e.startswith('2⃣')
+    emoji5 = e.startswith('🔢')
     reactor = modcheck(user)
     if reactor == True:
         return True
@@ -196,7 +197,7 @@ def getvoicerole(member):
     return voicerole
 
 def addnote(message):
-    if message.content.startswith('note'):
+    if message.content.startswith('note') or message.content.startswith('Note'):
         return True
     else:
         return False
@@ -306,20 +307,26 @@ async def on_reaction_add(reaction, user):
             if reasonemote == '❌':
                 await client.delete_message(denychoose.reaction.message)
                 return
-            denynote = await client.send_message(sendmedaddy, 'Would you like to add a note? :white_check_mark: or :x:')
+            denynote = await client.send_message(sendmedaddy, 'Would you like to add a note? :white_check_mark: or :x:. 🔢 to cancel')
             time.sleep(0.5)
             await client.add_reaction(denynote, '✅')
             time.sleep(0.5)
             await client.add_reaction(denynote, '❌')
-            denynotereact = await client.wait_for_reaction(emoji=['✅', '❌'], message=denynote, check=modvotecheck)
+            time.sleep(0.5)
+            await client.add_reaction(denynote, '🔢')
+            denynotereact = await client.wait_for_reaction(emoji=['✅', '❌', '🔢'], message=denynote, check=modvotecheck)
             notevote = denynotereact.reaction.emoji
             findtrue = 0
             if notevote == '✅':
                 findtrue = 1
+            elif notevote == '🔢':
+                await client.delete_message(denynote)
+                return
             if reasonemote == '1⃣':
                 if findtrue == 1:
                     notemessage = await client.send_message(sendmedaddy, 'Please type your note. Your message **must** begin with note (e.g. `note this sucks`)')
                     responsetemp = await client.wait_for_message(check=addnote, channel=sendmedaddy)
+                    response1 = responsetemp.content.replace('note ','')
                     response = responsetemp.content.replace('note ','')
                     try:
                         await client.send_message(saveauthor,':x: Your submission ' + found_emotename + ' has been rejected at stage 1, as it failed to meet the file requirements. Please reread the pinned submission guidelines.')
