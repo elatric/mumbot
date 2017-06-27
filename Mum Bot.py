@@ -1297,7 +1297,7 @@ async def on_message(message):
                         starobject.close()
                         await client.send_message(message.channel, 'Minimum star number set as `'+starnum+'`')
                         return
-            elif message.content.startswith('$broadcaster'):
+            elif message.content.startswith('$broadcast'):
                 parse = message.content
                 sep = parse.split()
                 server = client.get_server('214249708711837696')
@@ -1330,8 +1330,40 @@ async def on_message(message):
                         for user in userlist:
                             await client.edit_channel_permissions(voicechan, user, broadcasterperm)
                         await client.send_message(message.channel, 'User(s) removed')
+                    elif (sep[1] == 'start') or (sep[1] == 'Start'):
+                        voicechanobject = open('voicechan', 'rb')
+                        voicechan = pickle.load(voicechanobject)
+                        voicechanobject.close()
+                        storechannel = client.get_channel('301798483525107712')
+                        description = sep
+                        description.pop(0)
+                        description.pop(0)
+                        strdes = ' '.join(description)
+                        describeme = message.author.mention + ' has started a broadcast about ' + strdes+'! To listen, join the Station voice channel.\n\nPlease keep discussion to the automatically available home theater text channel.'
+                        embed = discord.Embed(colour = discord.Colour.dark_green(), type='rich', title = '🎙 Broadcast Started', description = describeme)
+                        embed.timestamp = datetime.datetime.now()
+                        await client.send_message(storechannel, embed = embed)
+                        targetrole = discord.utils.get(message.author.server.roles, name='thonks')
+                        thonksperm = discord.PermissionOverwrite()
+                        thonksperm.connect = True
+                        thonksperm.speak = False
+                        await client.edit_channel_permissions(voicechan, targetrole, thonksperm)
+                    elif (sep[1] == 'end') or (sep[1] == 'end') or (sep[1] == 'stop') or (sep[1] == 'stop'):
+                        voicechanobject = open('voicechan', 'rb')
+                        voicechan = pickle.load(voicechanobject)
+                        voicechanobject.close()
+                        storechannel = client.get_channel('301798483525107712')
+                        describeme = 'The broadcast has now ended. Thank you for listening!'
+                        embed = discord.Embed(colour = discord.Colour.dark_red(), type='rich', title = '🎙 Broadcast Ended', description = describeme)
+                        embed.timestamp = datetime.datetime.now()
+                        await client.send_message(storechannel, embed = embed)
+                        targetrole = discord.utils.get(message.author.server.roles, name='thonks')
+                        thonksperm = discord.PermissionOverwrite()
+                        thonksperm.connect = False
+                        thonksperm.speak = False
+                        await client.edit_channel_permissions(voicechan, targetrole, thonksperm)
                 else:
-                    await client.send_message(message.channel, 'Command syntax is as follows: `$broadcaster [add/remove/channel] [@user1] [@user2]` and so on for each user')
+                    await client.send_message(message.channel, 'Command syntax is as follows: `$broadcast [add/remove/start/end] [@user1 @user2 for changing broadcasters / description for starting a broadcast]`')
             else:
                 await client.send_message(message.channel, 'Invalid command.')
         elif (scheck == True) and (subtrue == True) and (emotesub == True) and (isitme == False):
