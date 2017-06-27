@@ -454,6 +454,7 @@ async def on_message(message):
         subtrue = subcheck(message)
         isitme = selfcheck(message.author)
         megacheck = megarolecheck(message.author)
+        starchan = getstarid()
         if message.mention_everyone == True and ccheck == False:
             storechannel = client.get_channel('214249708711837696')
             await client.send_message(storechannel, 'Mention detected. Shutting main channel down :x:')
@@ -1008,10 +1009,10 @@ async def on_message(message):
                 await client.send_message(message.channel, 'My dearest long legged, lovely, picturesque treasure, how are you doing today? I\'m better now that you\'re here -- while you\'re still responding, do you want to grab a drink later? Get something to eat? Get married? The usual')    
             elif message.content.startswith('$confess'):
                 await client.send_message(message.channel, 'Your such a fucking bitch honestly you told me to confess and now your turning me down why does anyone like you I hope you take your ugly face and [redacted]')
-            elif message.content.startswith('$roar'):
-                await client.send_message(message.channel, '`ROAR MOTHER FUCKER`')
+            elif message.content.startswith('$saki'):
+                await client.send_message(message.channel, 'l    i    t    e    r    a    l    l    y    a    l    l    d    a    y    e    v    e    r    y    d    a    y    <    3')
             elif message.content.startswith('$memes'):
-                await client.send_message(message.channel, '```$iloveyou\n$bruce\n$bruce2\n$hands\n$lovely\n$confess\n$roar```')
+                await client.send_message(message.channel, '```$iloveyou\n$bruce\n$bruce2\n$hands\n$lovely\n$confess\n$roar\n$saki```')
             elif message.content.startswith('$settings'):
                 modobject = open('modid', 'rb')
                 modroletemp = pickle.load(modobject)
@@ -1352,6 +1353,27 @@ async def on_message(message):
                             await client.send_message(logchannel, message.author.mention + ' wrote ```' + message.content + '```')
                             await client.delete_message(message)
                             return
+        elif message.channel.id == starchan.id and isitme == True:
+            repeatlist = []
+            async for check in client.logs_from(starchan, limit=7):
+                if message.content == check.content:
+                    repeatlist.append(check)
+            repeatlist.pop(0)
+            if len(repeatlist) >= 1:
+                if len(repeatlist) == 1:
+                    try:
+                        await client.delete_message(repeatlist[0])
+                    except:
+                        print('Starboard delete failure')
+                else:
+                    try:
+                        await client.delete_messages(repeatlist)
+                    except:
+                        time.sleep(5)
+                        try:
+                            await client.delete_messages(repeatlist)
+                        except:
+                            print('Starboard delete failure')
         elif message.server == None and message.content.startswith('$') and isitme == False:
             await client.send_message(message.author, 'You cannot use commands in DMs.')
         elif message.content.startswith('$pmute') and isitme == False:
@@ -1389,8 +1411,10 @@ async def on_message(message):
             await client.send_message(message.channel, 'Your such a fucking bitch honestly you told me to confess and now your turning me down why does anyone like you I hope you take your ugly face and [redacted]')
         elif message.content.startswith('$roar') and megacheck == True:
             await client.send_message(message.channel, '`ROAR MOTHER FUCKER`')
+        elif message.content.startswith('$saki') and megacheck == True:
+            await client.send_message(message.channel, 'l    i    t    e    r    a    l    l    y    a    l    l    d    a    y    e    v    e    r    y    d    a    y    <    3')
         elif message.content.startswith('$memes') and megacheck == True:
-            await client.send_message(message.channel, '```$iloveyou\n$bruce\n$bruce2\n$hands\n$lovely\n$confess\n$roar```')
+            await client.send_message(message.channel, '```$iloveyou\n$bruce\n$bruce2\n$hands\n$lovely\n$confess\n$roar\n$saki```')
         elif message.content.startswith('$purge') and mcheck == True:
             parse = message.content
             sep = parse.split()
