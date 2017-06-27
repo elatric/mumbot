@@ -457,13 +457,20 @@ async def on_message(message):
         starchan = getstarid()
         if message.mention_everyone == True and ccheck == False:
             storechannel = client.get_channel('214249708711837696')
-            await client.send_message(storechannel, 'Mention detected. Shutting main channel down :x:')
-            await client.send_message(storechannel, '-logs')
+            embed = discord.Embed(colour = discord.Colour.red(), type='rich', title = '🚫 Raid/spam protection has shut this channel down', description = 'Due to a mention of all the users in the server, this channel and all voice channels except for music have been temporarily closed for all users. Please wait for an admin to address the situation, and do not DM any staff in the meantime.')
+            embed.timestamp = datetime.datetime.now()
+            await client.send_message(storechannel, embed = embed)
             targetrole = discord.utils.get(message.author.server.roles, name='thonks')
-            overwrite = discord.PermissionOverwrite()
-            overwrite.send_messages = False
-            await client.edit_channel_permissions(storechannel, targetrole, overwrite)
-            await client.send_message(storechannel, 'Channel shut down. Please wait for an admin to address the situation')
+            overwrite1 = discord.PermissionOverwrite()
+            overwrite1.send_messages = False
+            overwrite1.add_reactions = False
+            await client.edit_channel_permissions(storechannel, targetrole, overwrite1)
+            voiceshutdown = ['323195721086140417', '323197019151925248', '322225458957647872']
+            for number in voiceshutdown:
+                tempchan = client.get_channel(number)
+                overwrite2 = discord.PermissionOverwrite()
+                overwrite2.connect = False
+                await client.edit_channel_permissions(tempchan, targetrole, overwrite2)
         elif (mcheck == True) and (scheck == True) and (ccheck == True) and (message.content.startswith('$')) and (isitme == False):
             if message.content.startswith('$status'):
                 vote = getvote()
@@ -996,7 +1003,7 @@ async def on_message(message):
                     else:
                         await client.send_message(message.channel, 'Invalid command or input. Type `$feature` for command syntax.')
             elif message.content.startswith('$help'):
-                await client.send_message(message.channel, 'Available commands: ```$shutdown - shuts #mums_living_room down to the plebs\n$status - post a status update or edit a status update for an emote\n$feature - turn bot modules on/off\n$purge - delete messages from a channel\n$settings - view roles and channels for this bot\n$modset - set the moderator role for this bot\n$voiceroleset - set the automatic voice role to be given\n$listen - add or remove a channel for the bot to listen to\n$subset - set the emote submission channel\n$modvoteset - set the moderator voting channel\n$voteset - set the user voting channel\n$statset - set the emote status channel\n$memes - list of copypastas\n$pmute - permanently mute a user```')
+                await client.send_message(message.channel, 'Available commands: ```$shutdown - shuts #mums_living_room down to the plebs\n$restore - reopens #mums_living_room\n$status - post a status update or edit a status update for an emote\n$feature - turn bot modules on/off\n$purge - delete messages from a channel\n$settings - view roles and channels for this bot\n$modset - set the moderator role for this bot\n$voiceroleset - set the automatic voice role to be given\n$listen - add or remove a channel for the bot to listen to\n$subset - set the emote submission channel\n$modvoteset - set the moderator voting channel\n$voteset - set the user voting channel\n$statset - set the emote status channel\n$memes - list of copypastas\n$pmute - permanently mute a user```')
             elif message.content.startswith('$iloveyou'):
                 await client.send_message(message.channel, 'OK I ADMIT IT I LOVE YOU OK i fucking love you and it breaks my heart when i see you play with someone else or anyone commenting in your profile i just want to be your boyfriend and put a heart in my profile linking to your profile and have a walltext of you commenting cute things i want to play video games talk in discord all night and watch a movie together but you just seem so uninterested in me it fucking kills me and i cant take it anymore i want to remove you but i care too much about you so please i\'m begging you to either love me back or remove me and NEVER contact me again it hurts so much to say this because i need you by my side but if you don\'t love me then i want you to leave because seeing your icon in my friendlist would kill me everyday of my pathetic life')
             elif message.content=='$bruce':
@@ -1234,13 +1241,36 @@ async def on_message(message):
                     await client.send_message(message.channel, 'Command syntax is as follows: `$pmute [@user1] [@user2]` and so on for each user')
             elif message.content.startswith('$shutdown'):
                 storechannel = client.get_channel('214249708711837696')
-                await client.send_message(storechannel, '-logs')
-                await client.send_message(storechannel, 'Raid or mention detected. Shutting main channel down :x:')
+                embed = discord.Embed(colour = discord.Colour.red(), type='rich', title = '🚫 Raid/spam protection has shut this channel down', description = 'Due to excessive chat activity, this channel and all voice channels except for music have been temporarily closed for all users. Please wait for an admin to address the situation, and do not DM any staff in the meantime.')
+                embed.timestamp = datetime.datetime.now()
+                await client.send_message(storechannel, embed = embed)
                 targetrole = discord.utils.get(message.author.server.roles, name='thonks')
-                overwrite = discord.PermissionOverwrite()
-                overwrite.send_messages = False
-                await client.edit_channel_permissions(storechannel, targetrole, overwrite)
-                await client.send_message(storechannel, 'Channel shut down. Please wait for an admin to address the situation')
+                overwrite1 = discord.PermissionOverwrite()
+                overwrite1.send_messages = False
+                overwrite1.add_reactions = False
+                await client.edit_channel_permissions(storechannel, targetrole, overwrite1)
+                voiceshutdown = ['323195721086140417', '323197019151925248', '322225458957647872']
+                for number in voiceshutdown:
+                    tempchan = client.get_channel(number)
+                    overwrite2 = discord.PermissionOverwrite()
+                    overwrite2.connect = False
+                    await client.edit_channel_permissions(tempchan, targetrole, overwrite2)
+            elif message.content.startswith('$restore'):
+                storechannel = client.get_channel('214249708711837696')
+                embed = discord.Embed(colour = discord.Colour.green(), type='rich', title = '✅ Raid/spam protection has been lifted on this channel', description = 'The situation has been handled and this channel has been reopened. Please do not spam messages asking what happened, but instead refer to the information in #announcements.')
+                embed.timestamp = datetime.datetime.now()
+                await client.send_message(storechannel, embed = embed)
+                targetrole = discord.utils.get(message.author.server.roles, name='thonks')
+                overwrite1 = discord.PermissionOverwrite()
+                overwrite1.send_messages = None
+                overwrite1.add_reactions = True
+                await client.edit_channel_permissions(storechannel, targetrole, overwrite1)
+                voiceshutdown = ['323195721086140417', '323197019151925248', '322225458957647872']
+                for number in voiceshutdown:
+                    tempchan = client.get_channel(number)
+                    overwrite2 = discord.PermissionOverwrite()
+                    overwrite2.connect = None
+                    await client.edit_channel_permissions(tempchan, targetrole, overwrite2)
             elif message.content.startswith('$starboard'):
                 parse = message.content
                 sep = parse.split()
@@ -1435,13 +1465,38 @@ async def on_message(message):
                 await client.send_message(message.channel, 'Invalid input! Type `$purge` for command syntax')
         elif message.content.startswith('$shutdown') and mcheck == True:
             storechannel = client.get_channel('214249708711837696')
-            await client.send_message(storechannel, '-logs')
-            await client.send_message(storechannel, 'Raid or mention detected. Shutting main channel down :x:')
+            embed = discord.Embed(colour = discord.Colour.red(), type='rich', title = '🚫 Raid/spam protection has shut this channel down', description = 'Due to excessive chat activity, this channel and all voice channels except for music have been temporarily closed for all users. Please wait for an admin to address the situation, and do not DM any staff in the meantime.')
+            embed.timestamp = datetime.datetime.now()
+            await client.send_message(storechannel, embed = embed)
             targetrole = discord.utils.get(message.author.server.roles, name='thonks')
-            overwrite = discord.PermissionOverwrite()
-            overwrite.send_messages = False
-            await client.edit_channel_permissions(storechannel, targetrole, overwrite)
-            await client.send_message(storechannel, 'Channel shut down. Please wait for an admin to address the situation')
+            overwrite1 = discord.PermissionOverwrite()
+            overwrite1.send_messages = False
+            overwrite1.add_reactions = False
+            await client.edit_channel_permissions(storechannel, targetrole, overwrite1)
+            voiceshutdown = ['323195721086140417', '323197019151925248', '322225458957647872']
+            for number in voiceshutdown:
+                tempchan = client.get_channel(number)
+                overwrite2 = discord.PermissionOverwrite()
+                overwrite2.connect = False
+                await client.edit_channel_permissions(tempchan, targetrole, overwrite2)
+            await client.delete_message(message)
+        elif message.content.startswith('$restore') and mcheck == True:
+            storechannel = client.get_channel('214249708711837696')
+            embed = discord.Embed(colour = discord.Colour.green(), type='rich', title = '✅ Raid/spam protection has been lifted on this channel', description = 'The situation has been handled and this channel has been reopened. Please do not spam messages asking what happened, but instead refer to the information in #announcements.')
+            embed.timestamp = datetime.datetime.now()
+            await client.send_message(storechannel, embed = embed)
+            targetrole = discord.utils.get(message.author.server.roles, name='thonks')
+            overwrite1 = discord.PermissionOverwrite()
+            overwrite1.send_messages = None
+            overwrite1.add_reactions = True
+            await client.edit_channel_permissions(storechannel, targetrole, overwrite1)
+            voiceshutdown = ['323195721086140417', '323197019151925248', '322225458957647872']
+            for number in voiceshutdown:
+                tempchan = client.get_channel(number)
+                overwrite2 = discord.PermissionOverwrite()
+                overwrite2.connect = None
+                await client.edit_channel_permissions(tempchan, targetrole, overwrite2)
+            await client.delete_message(message)
         elif message.author.id=='204255221017214977' and ccheck==True and ('Reported' in message.content):
             await client.add_reaction(message, '✅')
         elif message.content.startswith('$') and mcheck == False and isitme == False and ccheck == True:
