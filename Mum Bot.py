@@ -1343,18 +1343,12 @@ async def on_message(message):
                         embed = discord.Embed(colour = discord.Colour.dark_green(), type='rich', title = '🎙 Broadcast Started', description = describeme)
                         embed.timestamp = datetime.datetime.now()
                         await client.send_message(storechannel, embed = embed)
-                        voiceobject = open('voicechannel', 'wb')
-                        pickle.dump('on', voiceobject)
-                        voiceobject.close()
                         targetrole = discord.utils.get(message.author.server.roles, name='thonks')
                         thonksperm = discord.PermissionOverwrite()
                         thonksperm.connect = True
                         thonksperm.speak = False
                         await client.edit_channel_permissions(voicechan, targetrole, thonksperm)
                     elif (sep[1] == 'end') or (sep[1] == 'end') or (sep[1] == 'stop') or (sep[1] == 'stop'):
-                        voicechanobject = open('voicechan', 'rb')
-                        voicechan = pickle.load(voicechanobject)
-                        voicechanobject.close()
                         storechannel = client.get_channel('301798483525107712')
                         describeme = 'The broadcast has now ended. Thank you for listening!'
                         embed = discord.Embed(colour = discord.Colour.dark_red(), type='rich', title = '🎙 Broadcast Ended', description = describeme)
