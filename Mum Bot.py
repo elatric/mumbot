@@ -254,10 +254,13 @@ def on_voice_state_update(before, after):
     if run == True:
         giverole = getvoicerole(before)
         if not before.voice == after.voice:
-            try:
-                if after.voice_channel.id == '313489937037131776' or after.voice_channel.id == '313511584435666945' or after.voice_channel.id == '313545012426309632' or after.voice_channel.id == '313536996427694081':
-                    yield from client.add_roles(after, giverole)
-            except AttributeError:
+            voicechanobject = open('voicechan', 'rb')
+            voicechan = pickle.load(voicechanobject)
+            voicechanobject.close()
+            '''try:'''
+            if after.voice_channel == voicechan:
+                yield from client.add_roles(after, giverole)
+            elif after.voice_channel != voicechan:
                 yield from client.remove_roles(after, giverole)
 
 @client.event
@@ -1294,6 +1297,41 @@ async def on_message(message):
                         starobject.close()
                         await client.send_message(message.channel, 'Minimum star number set as `'+starnum+'`')
                         return
+            elif message.content.startswith('$broadcaster'):
+                parse = message.content
+                sep = parse.split()
+                server = client.get_server('214249708711837696')
+                if len(sep) != 1:
+                    if (sep[1] == 'channel') or (sep[1] == 'Channel'):
+                        voicechan = discord.utils.get(message.author.server.channels, id= sep[2])
+                        voicechanobject = open('voicechan', 'wb')
+                        pickle.dump(voicechan, voicechanobject)
+                        voicechanobject.close()
+                        await client.send_message(message.channel, 'Channel `'+voicechan.name +'` set as broadcast channel')
+                    elif (sep[1] == 'add') or (sep[1] == 'Add'):
+                        voicechanobject = open('voicechan', 'rb')
+                        voicechan = pickle.load(voicechanobject)
+                        voicechanobject.close()
+                        userlist = message.mentions
+                        broadcasterperm = discord.PermissionOverwrite()
+                        broadcasterperm.connect = True
+                        broadcasterperm.speak = True
+                        for user in userlist:
+                            await client.edit_channel_permissions(voicechan, user, broadcasterperm)
+                        await client.send_message(message.channel, 'User(s) added')
+                    elif (sep[1] == 'remove') or (sep[1] == 'Remove'):
+                        voicechanobject = open('voicechan', 'rb')
+                        voicechan = pickle.load(voicechanobject)
+                        voicechanobject.close()
+                        userlist = message.mentions
+                        broadcasterperm = discord.PermissionOverwrite()
+                        broadcasterperm.connect = None
+                        broadcasterperm.speak = False
+                        for user in userlist:
+                            await client.edit_channel_permissions(voicechan, user, broadcasterperm)
+                        await client.send_message(message.channel, 'User(s) removed')
+                else:
+                    await client.send_message(message.channel, 'Command syntax is as follows: `$broadcaster [add/remove/channel] [@user1] [@user2]` and so on for each user')
             else:
                 await client.send_message(message.channel, 'Invalid command.')
         elif (scheck == True) and (subtrue == True) and (emotesub == True) and (isitme == False):
