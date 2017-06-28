@@ -257,7 +257,6 @@ def on_voice_state_update(before, after):
             voicechanobject = open('voicechan', 'rb')
             voicechan = pickle.load(voicechanobject)
             voicechanobject.close()
-            '''try:'''
             if after.voice_channel == voicechan:
                 yield from client.add_roles(after, giverole)
             elif after.voice_channel != voicechan:
@@ -460,7 +459,7 @@ async def on_message(message):
         starchan = getstarid()
         if message.mention_everyone == True and ccheck == False:
             storechannel = client.get_channel('214249708711837696')
-            embed = discord.Embed(colour = discord.Colour.red(), type='rich', title = '🚫 Raid/spam protection has shut this channel down', description = 'Due to a mention of all the users in the server, this channel and all voice channels except for music have been temporarily closed for all users. Please wait for an admin to address the situation, and do not DM any staff in the meantime.')
+            embed = discord.Embed(colour = discord.Colour.dark_red(), type='rich', title = '🚫 Raid/spam protection has shut this channel down', description = 'Due to a mention of all the users in the server, this channel and all voice channels except for music have been temporarily closed for all users. Please wait for an admin to address the situation, and do not DM any staff in the meantime.')
             embed.timestamp = datetime.datetime.now()
             await client.send_message(storechannel, embed = embed)
             targetrole = discord.utils.get(message.author.server.roles, name='thonks')
@@ -1244,7 +1243,7 @@ async def on_message(message):
                     await client.send_message(message.channel, 'Command syntax is as follows: `$pmute [@user1] [@user2]` and so on for each user')
             elif message.content.startswith('$shutdown'):
                 storechannel = client.get_channel('214249708711837696')
-                embed = discord.Embed(colour = discord.Colour.red(), type='rich', title = '🚫 Raid/spam protection has shut this channel down', description = 'Due to excessive chat activity, this channel and all voice channels except for music have been temporarily closed for all users. Please wait for an admin to address the situation, and do not DM any staff in the meantime.')
+                embed = discord.Embed(colour = discord.Colour.dark_red(), type='rich', title = '🚫 Raid/spam protection has shut this channel down', description = 'Due to excessive chat activity, this channel and all voice channels except for music have been temporarily closed for all users. Please wait for an admin to address the situation, and do not DM any staff in the meantime.')
                 embed.timestamp = datetime.datetime.now()
                 await client.send_message(storechannel, embed = embed)
                 targetrole = discord.utils.get(message.author.server.roles, name='thonks')
@@ -1260,7 +1259,7 @@ async def on_message(message):
                     await client.edit_channel_permissions(tempchan, targetrole, overwrite2)
             elif message.content.startswith('$restore'):
                 storechannel = client.get_channel('214249708711837696')
-                embed = discord.Embed(colour = discord.Colour.green(), type='rich', title = '✅ Raid/spam protection has been lifted on this channel', description = 'The situation has been handled and this channel has been reopened. Please do not spam messages asking what happened, but instead refer to the information in #announcements.')
+                embed = discord.Embed(colour = discord.Colour.dark_green(), type='rich', title = '✅ Raid/spam protection has been lifted on this channel', description = 'The situation has been handled and this channel has been reopened. Please do not spam messages asking what happened, but instead refer to the information in #announcements.')
                 embed.timestamp = datetime.datetime.now()
                 await client.send_message(storechannel, embed = embed)
                 targetrole = discord.utils.get(message.author.server.roles, name='thonks')
@@ -1339,7 +1338,7 @@ async def on_message(message):
                         description.pop(0)
                         description.pop(0)
                         strdes = ' '.join(description)
-                        describeme = message.author.mention + ' has started a broadcast about ' + strdes+'! To listen, join the Station voice channel.\n\nPlease keep discussion to the automatically available home theater text channel.'
+                        describeme = message.author.mention + ' has started a broadcast: ' + strdes+'! To listen, join the Station voice channel.\n\nPlease keep discussion to the automatically available home theater text channel.'
                         embed = discord.Embed(colour = discord.Colour.dark_green(), type='rich', title = '🎙 Broadcast Started', description = describeme)
                         embed.timestamp = datetime.datetime.now()
                         await client.send_message(storechannel, embed = embed)
@@ -1349,19 +1348,31 @@ async def on_message(message):
                         thonksperm.speak = False
                         await client.edit_channel_permissions(voicechan, targetrole, thonksperm)
                     elif (sep[1] == 'end') or (sep[1] == 'end') or (sep[1] == 'stop') or (sep[1] == 'stop'):
-                        storechannel = client.get_channel('301798483525107712')
-                        describeme = 'The broadcast has now ended. Thank you for listening!'
-                        embed = discord.Embed(colour = discord.Colour.dark_red(), type='rich', title = '🎙 Broadcast Ended', description = describeme)
-                        embed.timestamp = datetime.datetime.now()
-                        await client.send_message(storechannel, embed = embed)
-                        voiceobject = open('voicechannel', 'wb')
-                        pickle.dump('off', voiceobject)
-                        voiceobject.close()
-                        targetrole = discord.utils.get(message.author.server.roles, name='thonks')
-                        thonksperm = discord.PermissionOverwrite()
-                        thonksperm.connect = False
-                        thonksperm.speak = False
-                        await client.edit_channel_permissions(voicechan, targetrole, thonksperm)
+                        tempchan = message.author.voice_channel
+                        voicechanobject = open('voicechan', 'rb')
+                        voicechan = pickle.load(voicechanobject)
+                        voicechanobject.close()
+                        if tempchan.id != voicechan.id:
+                            await client.send_message(message.channel, 'You must be in the broadcast channel to end the broadcast.')
+                            return
+                        else:
+                            storechannel = client.get_channel('301798483525107712')
+                            describeme = 'The broadcast has ended and all users have been disconnected. Thank you for listening!'
+                            embed = discord.Embed(colour = discord.Colour.dark_red(), type='rich', title = '🎙 Broadcast Ended', description = describeme)
+                            embed.timestamp = datetime.datetime.now()
+                            await client.send_message(storechannel, embed = embed)
+                            targetrole = discord.utils.get(message.author.server.roles, name='thonks')
+                            thonksperm = discord.PermissionOverwrite()
+                            thonksperm.connect = False
+                            thonksperm.speak = False
+                            await client.edit_channel_permissions(voicechan, targetrole, thonksperm)
+                            disconnect = await client.create_channel(server, 'Disconnecting...', type=discord.ChannelType.voice)
+                            for user in tempchan.voice_members:
+                                try:
+                                    await client.move_member(user, disconnect)
+                                except:
+                                    print('error moving user')
+                            await client.delete_channel(disconnect)
                 else:
                     await client.send_message(message.channel, 'Command syntax is as follows: `$broadcast [add/remove/start/end] [@user1 @user2 for changing broadcasters / description for starting a broadcast]`')
             else:
@@ -1535,7 +1546,7 @@ async def on_message(message):
                 await client.send_message(message.channel, 'Invalid input! Type `$purge` for command syntax')
         elif message.content.startswith('$shutdown') and mcheck == True:
             storechannel = client.get_channel('214249708711837696')
-            embed = discord.Embed(colour = discord.Colour.red(), type='rich', title = '🚫 Raid/spam protection has shut this channel down', description = 'Due to excessive chat activity, this channel and all voice channels except for music have been temporarily closed for all users. Please wait for an admin to address the situation, and do not DM any staff in the meantime.')
+            embed = discord.Embed(colour = discord.Colour.dark_red(), type='rich', title = '🚫 Raid/spam protection has shut this channel down', description = 'Due to excessive chat activity, this channel and all voice channels except for music have been temporarily closed for all users. Please wait for an admin to address the situation, and do not DM any staff in the meantime.')
             embed.timestamp = datetime.datetime.now()
             await client.send_message(storechannel, embed = embed)
             targetrole = discord.utils.get(message.author.server.roles, name='thonks')
@@ -1552,7 +1563,7 @@ async def on_message(message):
             await client.delete_message(message)
         elif message.content.startswith('$restore') and mcheck == True:
             storechannel = client.get_channel('214249708711837696')
-            embed = discord.Embed(colour = discord.Colour.green(), type='rich', title = '✅ Raid/spam protection has been lifted on this channel', description = 'The situation has been handled and this channel has been reopened. Please do not spam messages asking what happened, but instead refer to the information in #announcements.')
+            embed = discord.Embed(colour = discord.Colour.dark_green(), type='rich', title = '✅ Raid/spam protection has been lifted on this channel', description = 'The situation has been handled and this channel has been reopened. Please do not spam messages asking what happened, but instead refer to the information in #announcements.')
             embed.timestamp = datetime.datetime.now()
             await client.send_message(storechannel, embed = embed)
             targetrole = discord.utils.get(message.author.server.roles, name='thonks')
