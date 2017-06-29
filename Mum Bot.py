@@ -1005,7 +1005,7 @@ async def on_message(message):
                     else:
                         await client.send_message(message.channel, 'Invalid command or input. Type `$feature` for command syntax.')
             elif message.content.startswith('$help'):
-                await client.send_message(message.channel, 'Available commands: ```$shutdown - shuts #mums_living_room down to the plebs\n$restore - reopens #mums_living_room\n$status - post a status update or edit a status update for an emote\n$feature - turn bot modules on/off\n$purge - delete messages from a channel\n$settings - view roles and channels for this bot\n$modset - set the moderator role for this bot\n$voiceroleset - set the automatic voice role to be given\n$listen - add or remove a channel for the bot to listen to\n$subset - set the emote submission channel\n$modvoteset - set the moderator voting channel\n$voteset - set the user voting channel\n$statset - set the emote status channel\n$memes - list of copypastas\n$pmute - permanently mute a user```')
+                await client.send_message(message.channel, 'Available commands: ```$shutdown - shuts #mums_living_room down to the plebs\n$restore - reopens #mums_living_room\n$status - post a status update or edit a status update for an emote\n$feature - turn bot modules on/off\n$purge - delete messages from a channel\n$settings - view roles and channels for this bot\n$modset - set the moderator role for this bot\n$voiceroleset - set the automatic voice role to be given\n$listen - add or remove a channel for the bot to listen to\n$subset - set the emote submission channel\n$modvoteset - set the moderator voting channel\n$voteset - set the user voting channel\n$statset - set the emote status channel\n$memes - list of copypastas\n$pmute - permanently mute a user\n$broadcast - start/end a broadcast```')
             elif message.content.startswith('$iloveyou'):
                 await client.send_message(message.channel, 'OK I ADMIT IT I LOVE YOU OK i fucking love you and it breaks my heart when i see you play with someone else or anyone commenting in your profile i just want to be your boyfriend and put a heart in my profile linking to your profile and have a walltext of you commenting cute things i want to play video games talk in discord all night and watch a movie together but you just seem so uninterested in me it fucking kills me and i cant take it anymore i want to remove you but i care too much about you so please i\'m begging you to either love me back or remove me and NEVER contact me again it hurts so much to say this because i need you by my side but if you don\'t love me then i want you to leave because seeing your icon in my friendlist would kill me everyday of my pathetic life')
             elif message.content=='$bruce':
@@ -1020,8 +1020,12 @@ async def on_message(message):
                 await client.send_message(message.channel, 'Your such a fucking bitch honestly you told me to confess and now your turning me down why does anyone like you I hope you take your ugly face and [redacted]')
             elif message.content.startswith('$saki'):
                 await client.send_message(message.channel, 'l    i    t    e    r    a    l    l    y    a    l    l    d    a    y    e    v    e    r    y    d    a    y    <    3')
+            elif message.content.startswith('$dimash'):
+                di1 = discord.utils.get(message.author.server.emojis, name='dimash1')
+                di2 = discord.utils.get(message.author.server.emojis, name='dimash2')
+                await client.send_message(message.channel, str(di1)+str(di2)+':microphone2: weeeeeeeeeeeeeeeeeeeoooooooooooooooooo')
             elif message.content.startswith('$memes'):
-                await client.send_message(message.channel, '```$iloveyou\n$bruce\n$bruce2\n$hands\n$lovely\n$confess\n$roar\n$saki```')
+                await client.send_message(message.channel, '```$iloveyou\n$bruce\n$bruce2\n$hands\n$lovely\n$confess\n$roar\n$saki\n$dimash```')
             elif message.content.startswith('$settings'):
                 modobject = open('modid', 'rb')
                 modroletemp = pickle.load(modobject)
@@ -1524,8 +1528,12 @@ async def on_message(message):
             await client.send_message(message.channel, '`ROAR MOTHER FUCKER`')
         elif message.content.startswith('$saki') and megacheck == True:
             await client.send_message(message.channel, 'l    i    t    e    r    a    l    l    y    a    l    l    d    a    y    e    v    e    r    y    d    a    y    <    3')
+        elif message.content.startswith('$dimash') and megacheck == True:
+            di1 = discord.utils.get(message.author.server.emojis, name='dimash1')
+            di2 = discord.utils.get(message.author.server.emojis, name='dimash2')
+            await client.send_message(message.channel, str(di1)+str(di2)+':microphone2: weeeeeeeeeeeeeeeeeeeoooooooooooooooooo')
         elif message.content.startswith('$memes') and megacheck == True:
-            await client.send_message(message.channel, '```$iloveyou\n$bruce\n$bruce2\n$hands\n$lovely\n$confess\n$roar\n$saki```')
+            await client.send_message(message.channel, '```$iloveyou\n$bruce\n$bruce2\n$hands\n$lovely\n$confess\n$roar\n$saki\n$dimash```')
         elif message.content.startswith('$purge') and mcheck == True:
             parse = message.content
             sep = parse.split()
