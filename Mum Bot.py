@@ -19,12 +19,13 @@ logger.addHandler(handler)
 socket.setdefaulttimeout(45)
 
 client = discord.Client()
+server = client.get_server('214249708711837696')
 
 def modcheck(user):
-    server = client.get_server('214249708711837696')
     modobject = open('modid', 'rb')
     modrole = pickle.load(modobject)
     userid = user.id
+    server = client.get_server('214249708711837696')
     try:
         member = server.get_member(userid) 
         checkrole = member.roles
@@ -46,10 +47,10 @@ def modcheck(user):
         return False
 
 def megarolecheck(user):
-    server = client.get_server('214249708711837696')
     modobject = open('megaid', 'rb')
     modrole = pickle.load(modobject)
     userid = user.id
+    server = client.get_server('214249708711837696')
     try:
         member = server.get_member(userid) 
         checkrole = member.roles
@@ -70,46 +71,27 @@ def megarolecheck(user):
         print(user.id)
         return False
 
-def getvote():
-    voteobject = open('voteid', 'rb')
-    voteidtemp = pickle.load(voteobject)
-    voteid = client.get_channel(voteidtemp)
-    voteobject.close()
-    return voteid
-
-def getstat():
-    statobject = open('statid', 'rb')
-    statidtemp = pickle.load(statobject)
-    statid = client.get_channel(statidtemp)
-    statobject.close()
-    return statid
-
-def getsub():
-    subobject = open('subid', 'rb')
-    subidtemp = pickle.load(subobject)
-    subid = client.get_channel(subidtemp)
-    subobject.close()
-    return subid
-
-def getmodvote():
-    modvoteobject = open('modvote', 'rb')
-    modvotetemp = pickle.load(modvoteobject)
-    modid = client.get_channel(modvotetemp)
-    modvoteobject.close()
-    return modid
-
-def getstarid():
-    staridobject = open('starid', 'rb')
-    staridtemp = pickle.load(staridobject)
-    starid = client.get_channel(staridtemp)
-    staridobject.close()
-    return starid
-
-def getstarnum():
-    starnumobject = open('starnum', 'rb')
-    starnumtemp = pickle.load(starnumobject)
-    starnum = int(starnumtemp)
-    return starnum
+def get(name, returntype):
+    tempobject = open(name, 'rb')
+    tempid = pickle.load(tempobject)
+    tempobject.close()
+    server = client.get_server('214249708711837696')
+    if returntype == 'id':
+        return tempid
+    elif returntype == 'channel':
+        tempchan = client.get_channel(tempid)
+        return tempchan
+    elif returntype == 'role':
+        temprole = discord.utils.get(server.roles, id=tempid)
+        return temprole
+    elif returntype == 'int':
+        tempnum = int(tempid)
+        return tempnum
+    elif returntype == 'onoff':
+        if tempid == 'on':
+            return True
+        else:
+            return False
 
 def servercheck(message):
     testid = '305782987893768202'
@@ -135,26 +117,8 @@ def channelcheck(message):
         return False
 
 def subcheck(message):
-    subchan = getsub()
+    subchan = get('subid', 'channel')
     if message.channel.id == subchan.id:
-        return True
-    else:
-        return False
-
-def emotesubonoff():
-    emoteobject = open('emotesub', 'rb')
-    onoff = pickle.load(emoteobject)
-    emoteobject.close()
-    if onoff == 'on':
-        return True
-    else:
-        return False
-
-def voicechatonoff():
-    voiceobject = open('voicechannel', 'rb')
-    onoff = pickle.load(voiceobject)
-    voiceobject.close()
-    if onoff == 'on':
         return True
     else:
         return False
@@ -189,18 +153,40 @@ def selfcheck(user):
     else:
         return False
 
-def getvoicerole(member):
-    voiceobject = open('voiceid', 'rb')
-    voiceid = pickle.load(voiceobject)
-    voiceobject.close()
-    voicerole = discord.utils.get(member.server.roles, id=voiceid)
-    return voicerole
-
 def addnote(message):
     if message.content.startswith('note') or message.content.startswith('Note'):
         return True
     else:
         return False
+
+async def sendembed(preformat, channel, title, content, author):
+    embedbase = None
+    if preformat == 'No':
+        titleformat = '🚫 ' + title
+        embedbase = discord.Embed(colour = discord.Colour.dark_red(), type='rich', title=titleformat, description = content)
+        embedbase.timestamp = datetime.datetime.now()
+    elif preformat == 'Yes':
+        titleformat = '✅ ' + title
+        embedbase = discord.Embed(colour = discord.Colour.dark_green(), type='rich', title=titleformat, description = content)
+        embedbase.timestamp = datetime.datetime.now()
+    elif preformat == 'Maybe':
+        titleformat = '⚠ ' + title
+        embedbase = discord.Embed(colour = discord.Colour.dark_gold(), type='rich', title=titleformat, description = content)
+        embedbase.timestamp = datetime.datetime.now()
+    elif preformat == 'What':
+        titleformat = '❔ ' + title
+        embedbase = discord.Embed(colour = discord.Colour.dark_purple(), type='rich', title=titleformat, description = content)
+        embedbase.timestamp = datetime.datetime.now()
+    elif preformat == None:
+        embedbase = discord.Embed(type='rich', title=title, description = content)
+        embedbase.timestamp = datetime.datetime.now()
+    else:
+        return
+    if author == None:
+        await client.send_message(channel, embed=embedbase)
+    else:
+        embedbase.set_author(name=author.name, icon_url=author.avatar_url)
+        await client.send_message(channel, embed=embedbase)
 
 async def storeimage(link):
     storechannel = client.get_channel('317835738458619904')
@@ -222,7 +208,8 @@ async def storeimage(link):
                 post_image = tempembed['url'] 
             return post_image
         except:
-            await client.send_message(errorchannel, 'A problem occurred when trying to store image `'+link+'`')
+            descrip = 'A problem occurred when trying to store image '+link
+            await sendembed('Maybe', errorchannel, 'Error', descrip, None)
             return None
     else:
         print('Something went wrong when storing the image')
@@ -250,9 +237,9 @@ async def on_ready():
 @client.event
 @asyncio.coroutine
 def on_voice_state_update(before, after):
-    run = voicechatonoff()
+    run = get('voicechannel', 'onoff')
     if run == True:
-        giverole = getvoicerole(before)
+        giverole = get('voiceid', 'role')
         if not before.voice == after.voice:
             voicechanobject = open('voicechan', 'rb')
             voicechan = pickle.load(voicechanobject)
@@ -267,18 +254,18 @@ async def on_reaction_add(reaction, user):
     scheck = servercheck(reaction.message)
     mcheck = modcheck(user)
     isitme = selfcheck(user)
-    mvchannel = getmodvote()
-    emotesub = emotesubonoff()
+    mvchannel = get('modvote', 'channel')
+    emotesub = get('emotesub', 'onoff')
     ccheck = channelcheck(reaction.message)
     mvtrue = False
     found_embeds_temp = reaction.message.embeds
+    server = client.get_server('214249708711837696')
     if mvchannel.id == reaction.message.channel.id:
         mvtrue = True
     if (scheck == True) and (mcheck == True) and (mvtrue == True) and (isitme == False) and (emotesub == True) and (len(found_embeds_temp) != 0) and ((reaction.emoji == '❌') or (reaction.emoji == '✅')):
-        server = client.get_server('214249708711837696')
         livingroom = client.get_channel('214249708711837696')
         verdict = reaction.emoji
-        sendmedaddy = getmodvote()
+        sendmedaddy = get('modvote', 'channel')
         found_embeds = found_embeds_temp[0]
         findfields = found_embeds['fields']
         found_name = ''
@@ -374,7 +361,7 @@ async def on_reaction_add(reaction, user):
                 await client.send_message(saveauthor, ':white_check_mark: Your submission ' + found_emotename + ' has passed stage 1, and has been posted in the emote voting channel.')
             except:
                 await client.send_message(livingroom, saveauthor.mention + ' :white_check_mark: Your submission ' + found_emotename + ' has passed stage 1, and has been posted in the emote voting channel.')
-            vote = getvote()    
+            vote = get('voteid', 'channel')
             votepost = discord.Embed(colour = discord.Colour.teal(), type='rich')
             votepost.set_image(url=post_image)
             votepost.add_field(name='Emote Name: ', value = found_emotename, inline=True)
@@ -387,11 +374,12 @@ async def on_reaction_add(reaction, user):
     elif (scheck == True) and (mcheck == True) and (ccheck == True) and (isitme == False) and (reaction.emoji=='✅'):
         dcheck = reaction.emoji
         if reaction.message.author.id=='204255221017214977' and ('Reported' in reaction.message.content):
-            await client.send_message(reaction.message.channel, '**Report:**\n' + reaction.message.content+'\n**Handled by:** ' + user.name)
+            descrip = reaction.message.content
+            await sendembed('Yes', reaction.message.channel, 'Report Handled', descrip, user)
             await client.delete_message(reaction.message)
     elif (scheck==True) and (reaction.emoji == '⭐') and (reaction.message.channel.id!='301798483525107712') and (reaction.message.author.id != '155149108183695360') and (reaction.message.author.id != '204255221017214977'):
         post_reactions = reaction.message.reactions
-        starnumbase = getstarnum()
+        starnumbase = get('starnum', 'int')
         starnum = 0
         starlist = []
         for tempreact in post_reactions:
@@ -403,7 +391,7 @@ async def on_reaction_add(reaction, user):
             if (reactor.id == '119815473750736899') or (modcheck(reactor) == True):
                 modstar = 1
         if modstar == 1:
-            starchan = getstarid()
+            starchan = get('starid', 'channel')
             async for found_message in client.logs_from(starchan, limit=50):
                 if reaction.message.id in found_message.content:
                     return 
@@ -425,7 +413,7 @@ async def on_reaction_add(reaction, user):
             await client.send_message(starchan, info, embed = post)
             return
         elif starnum == starnumbase and modstar == 0:
-            starchan = getstarid()
+            starchan = get('starid', 'channel')
             async for found_message in client.logs_from(starchan, limit=50):
                 if reaction.message.id in found_message.content:
                     return 
@@ -452,11 +440,11 @@ async def on_message(message):
         mcheck = modcheck(message.author)
         scheck = servercheck(message)
         ccheck = channelcheck(message)
-        emotesub = emotesubonoff()
+        emotesub = get('emotesub', 'onoff')
         subtrue = subcheck(message)
         isitme = selfcheck(message.author)
         megacheck = megarolecheck(message.author)
-        starchan = getstarid()
+        starchan = get('starid', 'channel')
         if message.mention_everyone == True and ccheck == False:
             storechannel = client.get_channel('214249708711837696')
             embed = discord.Embed(colour = discord.Colour.dark_red(), type='rich', title = '🚫 Raid/spam protection has shut this channel down', description = 'Due to a mention of all the users in the server, this channel and all voice channels except for music have been temporarily closed for all users.\n\nPlease wait for an admin to address the situation, and do not DM any staff in the meantime.')
@@ -475,8 +463,8 @@ async def on_message(message):
                 await client.edit_channel_permissions(tempchan, targetrole, overwrite2)
         elif (mcheck == True) and (scheck == True) and (ccheck == True) and (message.content.startswith('$')) and (isitme == False):
             if message.content.startswith('$status'):
-                vote = getvote()
-                stat = getstat()
+                vote = get('voteid', 'channel')
+                stat = get('statid', 'channel')
                 if message.content == '$status help' or message.content == '$status':
                     await client.send_message(message.channel, '```$status [Set/Edit/Delete] [Emote Name **in colons** or Massreject] [Approved/Rejected/Pending/Global/Retired/Status Attribute/ # to reject] [Stage #] [Note]\nStatus Attributes: Name, Image, Author, Status, Note```')
                 else:
@@ -818,7 +806,7 @@ async def on_message(message):
                 temp = message.content
                 sepmod = temp.split()
                 if len(sepmod) == 1:
-                    await client.send_message(message.channel, 'The syntax for this command is as follows: `$modset @modrole`')
+                    await sendembed('What', message.channel, 'Command Syntax', '$modset @modrole', None)
                 else:
                     modstr = sepmod[1]
                     finalid1 = modstr.replace('<@&', '')
@@ -826,12 +814,13 @@ async def on_message(message):
                     modobject = open('modid', 'wb')
                     pickle.dump(finalid, modobject)
                     modobject.close()
-                    await client.send_message(message.channel, 'Base modrole set as {}' .format(finalid))
+                    descrip = 'Base modrole set as '+finalid
+                    await sendembed('Yes', message.channel, 'Success', descrip, None)
             elif message.content.startswith('$megaset'):
                 temp = message.content
                 sepmod = temp.split()
                 if len(sepmod) == 1:
-                    await client.send_message(message.channel, 'The syntax for this command is as follows: `$megaset @megathinkrole`')
+                    await sendembed('What', message.channel, 'Command Syntax', '$megaset @megathinkrole', None)
                 else:
                     modstr = sepmod[1]
                     finalid1 = modstr.replace('<@&', '')
@@ -839,12 +828,13 @@ async def on_message(message):
                     modobject = open('megaid', 'wb')
                     pickle.dump(finalid, modobject)
                     modobject.close()
-                    await client.send_message(message.channel, 'Megathink role set as {}' .format(finalid))
+                    descrip = 'Megathink role set as ' + finalid
+                    await sendembed('Yes', message.channel, 'Success', descrip, None)
             elif message.content.startswith('$voiceroleset'):
                 temp = message.content
                 sep = temp.split()
                 if len(sep) == 1:
-                    await client.send_message(message.channel, 'The syntax for this command is as follows: `$voiceroleset @voicerole`')
+                    await sendembed('What', message.channel, 'Command Syntax', '$voiceroleset @voicerole', None)
                 else:
                     idstr = sep[1]
                     finalid1 = idstr.replace('<@&', '')
@@ -852,12 +842,13 @@ async def on_message(message):
                     voiceobject = open('voiceid', 'wb')
                     pickle.dump(finalid, voiceobject)
                     voiceobject.close()
-                    await client.send_message(message.channel, 'Voice chat role set as {}' .format(finalid))
+                    descrip = 'Voice chat role set as ' + finalid
+                    await sendembed('Yes', message.channel, 'Success', descrip, None)
             elif message.content.startswith('$voteset'):
                 temp = message.content
                 sep = temp.split()
                 if len(sep) == 1:
-                    await client.send_message(message.channel, 'The syntax for this command is as follows: `$voteset #voting-channel`')
+                    await sendembed('What', message.channel, 'Command Syntax', '$voteset #voting-channel', None)
                 else:
                     chanstr = sep[1]
                     finalid1 = chanstr.replace('<#', '')
@@ -865,12 +856,13 @@ async def on_message(message):
                     voteobject = open('voteid', 'wb')
                     pickle.dump(finalid, voteobject)
                     voteobject.close()
-                    await client.send_message(message.channel, 'Voting channel set as {}' .format(finalid))
+                    descrip = 'Voting channel set as ' + finalid
+                    await sendembed('Yes', message.channel, 'Success', descrip, None)
             elif message.content.startswith('$statset'):
                 temp = message.content
                 sep = temp.split()
                 if len(sep) == 1:
-                    await client.send_message(message.channel, 'The syntax for this command is as follows: `$statset #status-channel`')
+                    await sendembed('What', message.channel, 'Command Syntax', '$statset #status-channel', None)
                 else:
                     chanstr = sep[1]
                     finalid1 = chanstr.replace('<#', '')
@@ -878,12 +870,13 @@ async def on_message(message):
                     statobject = open('statid', 'wb')
                     pickle.dump(finalid, statobject)
                     statobject.close()
-                    await client.send_message(message.channel, 'Status channel set as {}' .format(finalid))
+                    descrip = 'Status channel set as ' + finalid
+                    await sendembed('Yes', message.channel, 'Success', descrip, None)
             elif message.content.startswith('$subset'):
                 temp = message.content
                 sep = temp.split()
                 if len(sep) == 1:
-                    await client.send_message(message.channel, 'The syntax for this command is as follows: `$subset #submission-channel`')
+                    await sendembed('What', message.channel, 'Command Syntax', '$subset #submission-channel', None)
                 else:
                     chanstr = sep[1]
                     finalid1 = chanstr.replace('<#', '')
@@ -891,12 +884,13 @@ async def on_message(message):
                     subobject = open('subid', 'wb')
                     pickle.dump(finalid, subobject)
                     subobject.close()
-                    await client.send_message(message.channel, 'Submission channel set as {}' .format(finalid))
+                    descrip = 'Submission channel set as ' + finalid
+                    await sendembed('Yes', message.channel, 'Success', descrip, None)
             elif message.content.startswith('$modvoteset'):
                 temp = message.content
                 sep = temp.split()
                 if len(sep) == 1:
-                    await client.send_message(message.channel, 'The syntax for this command is as follows: `$modvoteset #mod-voting-channel`')
+                    await sendembed('What', message.channel, 'Command Syntax', '$modvoteset #mod-voting-channel', None)
                 else:
                     chanstr = sep[1]
                     finalid1 = chanstr.replace('<#', '')
@@ -904,7 +898,8 @@ async def on_message(message):
                     modvoteobject = open('modvote', 'wb')
                     pickle.dump(finalid, modvoteobject)
                     modvoteobject.close()
-                    await client.send_message(message.channel, 'Mod voting channel set as {}' .format(finalid))
+                    descrip = 'Mod voting channel set as ' + finalid
+                    await sendembed('Yes', message.channel, 'Success', descrip, None)
             elif message.content.startswith('$listen'):
                 parse = message.content
                 sep = parse.split()
@@ -915,7 +910,7 @@ async def on_message(message):
                         listenid = pickle.load(listenobject)
                         listenobject.close()
                     else:
-                        await client.send_message(message.channel, 'No listen channel list found! Appending to new list.')
+                        await sendembed('Maybe', message.channel, 'Missing File', 'No listen channel list found! Appending to new list.', None)
                     if sep[1] == 'add':
                         channel = sep[2]
                         finalid1 = channel.replace('<#', '')
@@ -924,7 +919,8 @@ async def on_message(message):
                         listenobject = open('listenid', 'wb')
                         pickle.dump(listenid, listenobject)
                         listenobject.close()
-                        await client.send_message(message.channel, 'Listen channel `{}` has been added.' .format(finalid))
+                        descrip = 'Listen channel '+finalid+' has been added'
+                        await sendembed('Yes', message.channel, 'Channel Added', descrip, None)
                     elif sep[1] == 'delete':
                         finallist = []
                         channel = sep[2]
@@ -936,11 +932,11 @@ async def on_message(message):
                         listenobject = open('listenid', 'wb')
                         pickle.dump(finallist, listenobject)
                         listenobject.close()
-                        await client.send_message(message.channel, 'Listen channel `{}` has been removed.' .format(finalid))
+                        descrip = 'Listen channel '+finalid+' has been removed'
+                        await sendembed('No', message.channel, 'Channel Removed', descrip, None)
                     else:
-                        await client.send_message(message.channel, 'Invalid command.')
+                        await sendembed('Maybe', message.channel, 'Invalid Command', 'The function you have called does not exist. Please type $listen for a list of available functions and current listening channels.', None)
                 elif len(sep) == 1:
-                    await client.send_message(message.channel, 'The syntax for this command is as follows: `$listen [add/delete] [#channel]`')
                     chanlist = 'None'
                     if os.path.exists('listenid'):
                         listenobject = open('listenid', 'rb')
@@ -952,60 +948,61 @@ async def on_message(message):
                             chanlist = ', '.join(listenid)
                     else:
                         chanlist = 'None'
-                    await client.send_message(message.channel, 'Current listening channels: `' + chanlist + '`')
+                    descrip = '$listen [add/delete] [#channel]\n\n'+ 'Current listening channels: ' + chanlist
+                    await sendembed('What', message.channel, 'Command Syntax', descrip, None)
                 else:
-                    await client.send_message(message.channel, 'Invalid command.')
+                    await sendembed('Maybe', message.channel, 'Invalid Command', 'You have inputted an invalid number of variables. Please type $listen for a list of available functions and current listening channels.', None)
             elif message.content.startswith('$feature'):
                 parse = message.content
                 sep = parse.split()
                 if len(sep) == 1:
-                    await client.send_message(message.channel, 'Command Syntax: `$feature [feature] [on/off]`')
-                    await client.send_message(message.channel, 'Available Features: ```emotesub - moves emote suggestions to mod channel for approval, and then to emote voting\nvoicechannel - gives users in voice chat access to a voice channel-only channel```')
-                    activefeatures = []
-                    check1 = emotesubonoff()
+                    check1 = get('emotesub', 'onoff')
                     if check1 == True:
-                        activefeatures.append('`emotesub - on, ')
+                        activefeatures.append('emotesub - on, ')
                     else:
-                        activefeatures.append('`emotesub - off, ')
-                    check2 = voicechatonoff()
+                        activefeatures.append('emotesub - off, ')
+                    check2 = get('voicechannel', 'onoff')
                     if check2 == True:
-                        activefeatures.append('voicechannel - on`')
+                        activefeatures.append('voicechannel - on')
                     else:
-                        activefeatures.append('voicechannel - off`')
+                        activefeatures.append('voicechannel - off')
                     activestring = ''.join(activefeatures)
                     await client.send_message(message.channel, 'Feature Status: ' + activestring)
+                    descrip = 'Command Syntax: $feature [feature] [on/off]\n\n' + 'Available Features: emotesub - handles emote submissions, voicechannel - gives users in voice chat access to a voice channel-only channel\n\n' + 'Feature Status: ' + activesting
+                    await sendembed('What', message.channel, 'Feature Information', descrip, None)
                 elif sep[2] == 'on':
                     if sep[1] == 'emotesub':
                         onoff = sep[2]
                         emoteobject = open('emotesub', 'wb')
                         pickle.dump(onoff, emoteobject)
                         emoteobject.close()
-                        await client.send_message(message.channel, 'Automated emote submissions have been turned on.')
+                        await sendembed('Yes', message.channel, 'Feature Enabled', 'Automated emote submissions have been turned on.', None)
                     elif sep[1] == 'voicechannel':
                         onoff = sep[2]
                         voiceobject = open('voicechannel', 'wb')
                         pickle.dump(onoff, voiceobject)
                         voiceobject.close()
-                        await client.send_message(message.channel, 'Automated voice text channel has been turned on.')
+                        await sendembed('Yes', message.channel, 'Feature Enabled', 'Automated voice text channel has been turned on.', None)
                     else:
-                        await client.send_message(message.channel, 'Invalid command or input. Type `$feature` for command syntax.')
+                        await sendembed('Maybe', message.channel, 'Invalid Command', 'The function you have called does not exist. Please type $feature for command syntax and information.', None)
                 elif sep[2] == 'off':
                     if sep[1] == 'emotesub':
                         onoff = sep[2]
                         emoteobject = open('emotesub', 'wb')
                         pickle.dump(onoff, emoteobject)
                         emoteobject.close()
-                        await client.send_message(message.channel, 'Automated emote submissions have been turned off.')
+                        await sendembed('No', message.channel, 'Feature Disabled', 'Automated emote submissions have been turned off.', None)
                     elif sep[1] == 'voicechannel':
                         onoff = sep[2]
                         voiceobject = open('voicechannel', 'wb')
                         pickle.dump(onoff, voiceobject)
                         voiceobject.close()
-                        await client.send_message(message.channel, 'Automated voice text channel has been turned off.')
+                        await sendembed('No', message.channel, 'Feature Disabled', 'Automated voice text channel has been turned off.', None)
                     else:
-                        await client.send_message(message.channel, 'Invalid command or input. Type `$feature` for command syntax.')
+                        await sendembed('Maybe', message.channel, 'Invalid Command', 'The function you have called does not exist. Please type $feature for command syntax and information.', None)
             elif message.content.startswith('$help'):
-                await client.send_message(message.channel, 'Available commands: ```$shutdown - shuts #mums_living_room down to the plebs\n$restore - reopens #mums_living_room\n$status - post a status update or edit a status update for an emote\n$feature - turn bot modules on/off\n$purge - delete messages from a channel\n$settings - view roles and channels for this bot\n$modset - set the moderator role for this bot\n$voiceroleset - set the automatic voice role to be given\n$listen - add or remove a channel for the bot to listen to\n$subset - set the emote submission channel\n$modvoteset - set the moderator voting channel\n$voteset - set the user voting channel\n$statset - set the emote status channel\n$memes - list of copypastas\n$pmute - permanently mute a user\n$broadcast - start/end a broadcast```')
+                descrip = '$shutdown - shuts #mums_living_room down to the plebs\n$restore - reopens #mums_living_room\n$status - post a status update or edit a status update for an emote\n$feature - turn bot modules on/off\n$purge - delete messages from a channel\n$settings - view roles and channels for this bot\n$modset - set the moderator role for this bot\n$voiceroleset - set the automatic voice role to be given\n$listen - add or remove a channel for the bot to listen to\n$subset - set the emote submission channel\n$modvoteset - set the moderator voting channel\n$voteset - set the user voting channel\n$statset - set the emote status channel\n$memes - list of copypastas\n$pmute - permanently mute a user\n$broadcast - start/end a broadcast\n$bkick - kick a user from the station'
+                await sendembed('What', message.channel, 'Available Commands', descrip, None)
             elif message.content.startswith('$iloveyou'):
                 await client.send_message(message.channel, 'OK I ADMIT IT I LOVE YOU OK i fucking love you and it breaks my heart when i see you play with someone else or anyone commenting in your profile i just want to be your boyfriend and put a heart in my profile linking to your profile and have a walltext of you commenting cute things i want to play video games talk in discord all night and watch a movie together but you just seem so uninterested in me it fucking kills me and i cant take it anymore i want to remove you but i care too much about you so please i\'m begging you to either love me back or remove me and NEVER contact me again it hurts so much to say this because i need you by my side but if you don\'t love me then i want you to leave because seeing your icon in my friendlist would kill me everyday of my pathetic life')
             elif message.content=='$bruce':
@@ -1025,7 +1022,8 @@ async def on_message(message):
                 di2 = discord.utils.get(message.author.server.emojis, name='dimash2')
                 await client.send_message(message.channel, str(di1)+str(di2)+':microphone2: weeeeeeeeeeeeeeeeeeeoooooooooooooooooo')
             elif message.content.startswith('$memes'):
-                await client.send_message(message.channel, '```$iloveyou\n$bruce\n$bruce2\n$hands\n$lovely\n$confess\n$roar\n$saki\n$dimash```')
+                descrip = '$iloveyou\n$bruce\n$bruce2\n$hands\n$lovely\n$confess\n$roar\n$saki\n$dimash'
+                await sendembed('What', message.channel, 'Memes', descrip, None)
             elif message.content.startswith('$settings'):
                 modobject = open('modid', 'rb')
                 modroletemp = pickle.load(modobject)
@@ -1075,7 +1073,8 @@ async def on_message(message):
                 statid = client.get_channel(statidtemp)
                 statobject.close()
                 statname = statid.name
-                await client.send_message(message.channel, 'Roles:```Bot moderator role - {}\nVoice Chat Role - {}\n```\nChannels:```Listening Channels - {}\nSubmission Channel - {}\nModerator Voting Channel - {}\nUser Voting Channel - {}\nEmote Status Channel - {}```'.format(modname, voicename, listenname, subname, modchanname, votename, statname))
+                descrip = 'Roles:\nBot moderator role - {}\nVoice Chat Role - {}\n\nChannels:\nListening Channels - {}\nSubmission Channel - {}\nModerator Voting Channel - {}\nUser Voting Channel - {}\nEmote Status Channel - {}'.format(modname, voicename, listenname, subname, modchanname, votename, statname)
+                await sendembed('What', message.channel, 'Server Settings', descrip, None)
             elif message.content.startswith('$settoken'):
                 parse = message.content
                 sep = parse.split()
@@ -1093,21 +1092,23 @@ async def on_message(message):
                     if number >= 2:
                         async for x in client.logs_from(message.channel, limit = number):
                             mgs.append(x)
-                        await client.send_message(message.channel, 'Purging `'+sep[1]+'` messages')
+                        title = 'Purging `'+sep[1]+'` messages'
+                        await sendembed('No', message.channel, title, None, message.author)
                         await client.delete_messages(mgs)
                     else:
-                        await client.send_message(message.channel, 'Invalid number of messages to purge!')
+                        await sendembed('Maybe', message.channel, 'Error Purging Messages', 'Invalid number of messages to purge!', message.author)
                 elif len(sep) == 1:
-                    await client.send_message(message.channel, 'Command syntax is as follows: `$purge [# of messages to purge]` -- number must be >= 2')
+                    await sendembed('What', message.channel, 'Command Syntax', '$purge [# of messages to purge]` -- number must be >= 2', None)
                 else:
-                    await client.send_message(message.channel, 'Invalid input! Type `$purge` for command syntax')
+                    await sendembed('What', message.channel, 'Invalid Command', 'Type `$purge` for command syntax', None)
             elif message.content.startswith('$terminate'):
-                await client.send_message(message.channel, message.author.mention + ' has terminated Mum\'s Helper')
+                await sendembed('No', message.channel, 'Bot Terminated', None, message.author)
+                await client.delete_message(message)
                 sys.exit()
             elif message.content.startswith('$startvote'):
-                vote = getvote()
-                await client.send_message(message.channel, message.author.mention + ' has opened voting in `'+vote.id+'`')
-                await client.send_message(message.channel, 'Now adding reactions')
+                vote = get('voteid', 'channel')
+                descrip = 'Voting has been opened in '+vote.id+'\n\n Now adding reactions'
+                await sendembed('Yes', message.channel, 'Voting Opened', 'Voting has been opened in ', message.author)
                 async for x in client.logs_from(vote):
                     if selfcheck(x.author) == True:
                         try:
@@ -1118,67 +1119,12 @@ async def on_message(message):
                             await client.add_reaction(x, '👎')
                         except:
                             print('owo')
-            elif message.content.startswith('$imgfix'):
-                vote = getvote()
-                parse = message.content
-                sep = parse.split()
-                '''if len(sep) == 1:
-                    await client.send_message(message.channel, 'Command syntax is as follows: `$imgfix [emotename]` -- case sensitive')
-                    await client.delete_message(message)
-                    return'''
-                if len(sep) == 1:
-                    '''colcountstr = sep[1]
-                    colcount = colcountstr.count(':')
-                    colfix = ''
-                    if colcount != 2 and colcount != 0:
-                        colfix = colcountstr.replace(':', '')
-                        colfix = ':' + colcountstr + ':'
-                    elif colcount == 0:
-                        colfix = ':' + colcountstr + ':'
-                    else:
-                        colfix = colcountstr
-                    find_key = colfix
-                    found_message = None
-                    found = '0'''
-                    async for found_message in client.logs_from(vote, limit=112):
-                        if selfcheck(found_message.author) == True:
-                            '''checkembed = check.embeds
-                            check_embed1 = None
-                            if len(checkembed) == 1:
-                                check_embed1 = checkembed[0]
-                                findfields = check_embed1['fields']
-                                for field in findfields:
-                                    if (find_key in field['value']):
-                                        found_message = check
-                                        found = '1'
-                                        break
-                            else:
-                                if (find_key in check.content) and ('$status' not in check.content) and (len(check.reactions)==2):
-                                    found_message = check
-                                    found = '1'
-                                    break'''
-                    #if found == '1':
-                            found_embeds_temp = found_message.embeds
-                            found_embeds = found_embeds_temp[0]
-                            post_image=found_embeds['image']['proxy_url']
-                            finalimage = await storeimage(post_image)
-                            await client.send_message(message.author, post_image + '\n' + finalimage)
-                            final_embed = discord.Embed.from_data(found_embeds)
-                            final_embed.set_image(url=finalimage)
-                            time.sleep(2)
-                            await client.edit_message(found_message, new_content = None, embed = final_embed)
-                    await client.delete_message(message)
-                    '''else:
-                        await client.send_message(message.channel, 'Search term `'+find_key+'` not found')
-                        await client.delete_message(message)
-                        return'''
             elif message.content.startswith('$review'):
-                vote = getvote()
+                vote = get('voteid', 'channel')
                 parse = message.content
                 sep = parse.split()
                 if len(sep) == 1:
-                    await client.send_message(message.channel, 'Command syntax is as follows: `$review [emotename]` -- case sensitive')
-                    await client.delete_message(message)
+                    await sendembed('What', message.channel, 'Command Syntax', '$review [emotename]` -- case sensitive', None)
                     return
                 elif len(sep) == 2:
                     colcountstr = sep[1]
@@ -1228,7 +1174,6 @@ async def on_message(message):
             elif message.content.startswith('$pmute'):
                 parse = message.content
                 sep = parse.split()
-                server = client.get_server('214249708711837696')
                 muterole = discord.utils.get(message.author.server.roles, id='303319098430062602')
                 if len(sep) != 1:
                     userlist = message.mentions
@@ -1238,13 +1183,16 @@ async def on_message(message):
                             await client.add_roles(user, muterole)
                             mutelist.append(user.mention)
                         except:
-                            await client.send_message(message.channel, 'User ' + user.mention + ' is already muted')
+                            print('owo')
                     if len(mutelist) == 1:
-                        await client.send_message(message.channel, 'User ' + ''.join(mutelist) + ' has been permanently muted')
+                        descrip = 'User ' + ''.join(mutelist) + ' has been permanently muted'
+                        await sendembed('No', message.channel, 'User Muted', descrip, message.author)
                     else:
-                        await client.send_message(message.channel, 'Users ' + ', '.join(mutelist) + ' have been permanently muted')
+                        descrip = 'Users ' + ''.join(mutelist) + ' has been permanently muted'
+                        await sendembed('No', message.channel, 'Users Muted', descrip, message.author)
+                    await client.delete_message(message)
                 else:
-                    await client.send_message(message.channel, 'Command syntax is as follows: `$pmute [@user1] [@user2]` and so on for each user')
+                    await sendembed('What', message.channel, 'Command Syntax', '$pmute [@user1] [@user2], etc.', None)
             elif message.content.startswith('$shutdown'):
                 storechannel = client.get_channel('214249708711837696')
                 embed = discord.Embed(colour = discord.Colour.dark_red(), type='rich', title = '🚫 Raid/spam protection has shut this channel down', description = 'Due to excessive chat activity, this channel and all voice channels except for music have been temporarily closed for all users.\n\nPlease wait for an admin to address the situation, and do not DM any staff in the meantime.')
@@ -1281,8 +1229,7 @@ async def on_message(message):
                 parse = message.content
                 sep = parse.split()
                 if len(sep) == 1:
-                    await client.send_message(message.channel, 'Command syntax is as follows: `$starboard [set/num] [channel/minimum stars]`')
-                    return
+                    await sendembed('What', message.channel, 'Command Syntax', '$starboard [set/num] [channel/minimum stars]', None)
                 else:
                     if sep[1] == 'Set' or sep[1] == 'set':
                         channel = sep[2]
@@ -1291,26 +1238,26 @@ async def on_message(message):
                         starobject = open('starid', 'wb')
                         pickle.dump(starid, starobject)
                         starobject.close()
-                        await client.send_message(message.channel, 'Starboard channel set as `'+starid+'`')
-                        return
+                        descrip = 'Starboard channel set as '+starid
+                        await sendembed('Yes', message.channel, 'Success', descrip, None)
                     elif sep[1] == 'num' or sep[1] == 'Num':
                         starnum = sep[2]
                         starobject = open('starnum', 'wb')
                         pickle.dump(starnum, starobject)
                         starobject.close()
-                        await client.send_message(message.channel, 'Minimum star number set as `'+starnum+'`')
-                        return
+                        descrip = 'Minimum star number set as '+starnum
+                        await sendembed('Yes', message.channel, 'Success', descrip, None)
             elif message.content.startswith('$broadcast'):
                 parse = message.content
                 sep = parse.split()
-                server = client.get_server('214249708711837696')
                 if len(sep) != 1:
                     if (sep[1] == 'channel') or (sep[1] == 'Channel'):
                         voicechan = discord.utils.get(message.author.server.channels, id= sep[2])
                         voicechanobject = open('voicechan', 'wb')
                         pickle.dump(voicechan, voicechanobject)
                         voicechanobject.close()
-                        await client.send_message(message.channel, 'Channel `'+voicechan.name +'` set as broadcast channel')
+                        descrip = 'Channel '+voicechan.name +' set as broadcast channel'
+                        await sendembed('Yes', message.channel, 'Success', descrip, None)
                     elif (sep[1] == 'add') or (sep[1] == 'Add'):
                         voicechanobject = open('voicechan', 'rb')
                         voicechan = pickle.load(voicechanobject)
@@ -1321,7 +1268,7 @@ async def on_message(message):
                         broadcasterperm.speak = True
                         for user in userlist:
                             await client.edit_channel_permissions(voicechan, user, broadcasterperm)
-                        await client.send_message(message.channel, 'User(s) added')
+                        await sendembed('Yes', message.channel, 'Broadcaster(s) Added', None, None)
                     elif (sep[1] == 'remove') or (sep[1] == 'Remove'):
                         voicechanobject = open('voicechan', 'rb')
                         voicechan = pickle.load(voicechanobject)
@@ -1332,7 +1279,7 @@ async def on_message(message):
                         broadcasterperm.speak = False
                         for user in userlist:
                             await client.edit_channel_permissions(voicechan, user, broadcasterperm)
-                        await client.send_message(message.channel, 'User(s) removed')
+                        await sendembed('No', message.channel, 'Broadcaster(s) Removed', None, None)
                     elif (sep[1] == 'start') or (sep[1] == 'Start'):
                         voicechanobject = open('voicechan', 'rb')
                         voicechan = pickle.load(voicechanobject)
@@ -1357,7 +1304,7 @@ async def on_message(message):
                         voicechan = pickle.load(voicechanobject)
                         voicechanobject.close()
                         if tempchan.id != voicechan.id:
-                            await client.send_message(message.channel, 'You must be in the broadcast channel to end the broadcast.')
+                            await sendembed('Maybe', message.channel, 'Error Ending Broadcast', 'You must be in the broadcast channel to end the broadcast.', None)
                             return
                         else:
                             storechannel = client.get_channel('301798483525107712')
@@ -1378,9 +1325,46 @@ async def on_message(message):
                                     print('error moving user')
                             await client.delete_channel(disconnect)
                 else:
-                    await client.send_message(message.channel, 'Command syntax is as follows: `$broadcast [add/remove/start/end] [@user1 @user2 for changing broadcasters / description for starting a broadcast]`')
+                    await sendembed('What', message.channel, 'Command Syntax', '$broadcast [add/remove/start/end] [@user1 @user2 for changing broadcasters / description for starting a broadcast]', None)
+            elif message.content.startswith('$bkick'):
+                parse = message.content
+                sep = parse.split()
+                if len(sep) != 1:
+                    voicechanobject = open('voicechan', 'rb')
+                    voicechan = pickle.load(voicechanobject)
+                    voicechanobject.close()
+                    userlist = message.mentions
+                    kickperm = discord.PermissionOverwrite()
+                    kickperm.connect = False
+                    kickperm.speak = False
+                    try:
+                        kickchan = await client.create_channel(server, 'Kicking...', type=discord.ChannelType.voice)
+                    except:
+                        await sendembed('Maybe', message.channel, 'Error Kicking User', 'Unable to kick at this time. Please retry once the voice channel has disappeared.', message.author)
+                        await client.delete_message(message)
+                        return
+                    kicklist = []
+                    for user in userlist:
+                        await client.edit_channel_permissions(voicechan, user, kickperm)
+                        try:
+                            await client.move_member(user, kickchan)
+                        except:
+                            print('error moving user')
+                        kicklist.append(user.mention)
+                    await client.delete_channel(kickchan)
+                    kickstr = ' '.join(kicklist)
+                    if len(sep) == 2:
+                        title = 'User '+kickstr+' has been kicked from the channel'
+                        await sendembed('No', message.channel, title, None, message.author)
+                        await client.delete_message(message)
+                    else:
+                        title = 'Users '+kickstr+' have been kicked from the channel'
+                        await sendembed('No', message.channel, title, None, message.author)
+                        await client.delete_message(message)
+                else:
+                    await sendembed('What', message.channel, 'Command Syntax', '$bkick [@user1] [@user2], etc.', None)
             else:
-                await client.send_message(message.channel, 'Invalid command.')
+                await sendembed('Maybe', message.channel, 'Invalid Command', None, None)
         elif (scheck == True) and (subtrue == True) and (emotesub == True) and (isitme == False):
             time.sleep(1)
             try: 
@@ -1436,7 +1420,7 @@ async def on_message(message):
                             if (iwidth == 112) and (iheight == 112) and ('.png' in post_image1):
                                 size = 30
                                 post_image = await resizeimage(post_image1, size)
-                                sendmedaddy = getmodvote()
+                                sendmedaddy = get('modvote', 'channel')
                                 post = discord.Embed(colour = discord.Colour.teal(), type='rich')
                                 post.add_field(name='Emote Name: ', value = sep[0], inline=True)
                                 post.add_field(name='Submitted by: ', value = message.author.mention, inline=True)
@@ -1492,26 +1476,27 @@ async def on_message(message):
         elif message.server == None and message.content.startswith('$') and isitme == False:
             await client.send_message(message.author, 'You cannot use commands in DMs.')
         elif message.content.startswith('$pmute') and isitme == False:
-            if megacheck == True:
-                parse = message.content
-                sep = parse.split()
-                server = client.get_server('214249708711837696')
-                muterole = discord.utils.get(message.author.server.roles, id='303319098430062602')
-                if len(sep) != 1:
-                    userlist = message.mentions
-                    mutelist = []
-                    for user in userlist:
-                        try:
-                            await client.add_roles(user, muterole)
-                            mutelist.append(user.mention)
-                        except:
-                            await client.send_message(message.channel, 'User ' + user.mention + ' is already muted')
-                    if len(mutelist) == 1:
-                        await client.send_message(message.channel, 'User ' + ''.join(mutelist) + ' has been permanently muted')
-                    else:
-                        await client.send_message(message.channel, 'Users ' + ', '.join(mutelist) + ' have been permanently muted')
+            parse = message.content
+            sep = parse.split()
+            muterole = discord.utils.get(message.author.server.roles, id='303319098430062602')
+            if len(sep) != 1:
+                userlist = message.mentions
+                mutelist = []
+                for user in userlist:
+                    try:
+                        await client.add_roles(user, muterole)
+                        mutelist.append(user.mention)
+                    except:
+                        print('owo')
+                if len(mutelist) == 1:
+                    descrip = 'User ' + ''.join(mutelist) + ' has been permanently muted'
+                    await sendembed('No', message.channel, 'User Muted', descrip, message.author)
                 else:
-                    await client.send_message(message.channel, 'Command syntax is as follows: `$pmute [@user1] [@user2]` and so on for each user')
+                    descrip = 'Users ' + ''.join(mutelist) + ' has been permanently muted'
+                    await sendembed('No', message.channel, 'Users Muted', descrip, message.author)
+                await client.delete_message(message)
+            else:
+                await sendembed('What', message.channel, 'Command Syntax', '$pmute [@user1] [@user2], etc.', None)
         elif message.content.startswith('$iloveyou') and megacheck == True:
             await client.send_message(message.channel, 'OK I ADMIT IT I LOVE YOU OK i fucking love you and it breaks my heart when i see you play with someone else or anyone commenting in your profile i just want to be your boyfriend and put a heart in my profile linking to your profile and have a walltext of you commenting cute things i want to play video games talk in discord all night and watch a movie together but you just seem so uninterested in me it fucking kills me and i cant take it anymore i want to remove you but i care too much about you so please i\'m begging you to either love me back or remove me and NEVER contact me again it hurts so much to say this because i need you by my side but if you don\'t love me then i want you to leave because seeing your icon in my friendlist would kill me everyday of my pathetic life')
         elif message.content=='$bruce' and megacheck == True:
@@ -1533,7 +1518,8 @@ async def on_message(message):
             di2 = discord.utils.get(message.author.server.emojis, name='dimash2')
             await client.send_message(message.channel, str(di1)+str(di2)+':microphone2: weeeeeeeeeeeeeeeeeeeoooooooooooooooooo')
         elif message.content.startswith('$memes') and megacheck == True:
-            await client.send_message(message.channel, '```$iloveyou\n$bruce\n$bruce2\n$hands\n$lovely\n$confess\n$roar\n$saki\n$dimash```')
+            descrip = '$iloveyou\n$bruce\n$bruce2\n$hands\n$lovely\n$confess\n$roar\n$saki\n$dimash'
+            await sendembed('What', message.channel, 'Memes', descrip, None)
         elif message.content.startswith('$purge') and mcheck == True:
             parse = message.content
             sep = parse.split()
@@ -1544,14 +1530,15 @@ async def on_message(message):
                 if number >= 2:
                     async for x in client.logs_from(message.channel, limit = number):
                         mgs.append(x)
-                    await client.send_message(message.channel, 'Purging `'+sep[1]+'` messages')
+                    title = 'Purging `'+sep[1]+'` messages'
+                    await sendembed('No', message.channel, title, None, message.author)
                     await client.delete_messages(mgs)
                 else:
-                    await client.send_message(message.channel, 'Invalid number of messages to purge!')
+                    await sendembed('Maybe', message.channel, 'Error Purging Messages', 'Invalid number of messages to purge!', message.author)
             elif len(sep) == 1:
-                await client.send_message(message.channel, 'Command syntax is as follows: `$purge [# of messages to purge]` -- number must be >= 2')
+                await sendembed('What', message.channel, 'Command Syntax', '$purge [# of messages to purge]` -- number must be >= 2', None)
             else:
-                await client.send_message(message.channel, 'Invalid input! Type `$purge` for command syntax')
+                await sendembed('What', message.channel, 'Invalid Command', 'Type `$purge` for command syntax', None)
         elif message.content.startswith('$shutdown') and mcheck == True:
             storechannel = client.get_channel('214249708711837696')
             embed = discord.Embed(colour = discord.Colour.dark_red(), type='rich', title = '🚫 Raid/spam protection has shut this channel down', description = 'Due to excessive chat activity, this channel and all voice channels except for music have been temporarily closed for all users.\n\nPlease wait for an admin to address the situation, and do not DM any staff in the meantime.')
@@ -1586,10 +1573,45 @@ async def on_message(message):
                 overwrite2.connect = None
                 await client.edit_channel_permissions(tempchan, targetrole, overwrite2)
             await client.delete_message(message)
+        elif message.content.startswith('$bkick') and mcheck == True:
+            parse = message.content
+            sep = parse.split()
+            if len(sep) != 1:
+                voicechanobject = open('voicechan', 'rb')
+                voicechan = pickle.load(voicechanobject)
+                voicechanobject.close()
+                userlist = message.mentions
+                kickperm = discord.PermissionOverwrite()
+                kickperm.connect = False
+                kickperm.speak = False
+                try:
+                    kickchan = await client.create_channel(server, 'Kicking...', type=discord.ChannelType.voice)
+                except:
+                    await sendembed('Maybe', message.channel, 'Error Kicking User', 'Unable to kick at this time. Please retry once the voice channel has disappeared.', message.author)
+                    await client.delete_message(message)
+                    return
+                kicklist = []
+                for user in userlist:
+                    await client.edit_channel_permissions(voicechan, user, kickperm)
+                    try:
+                        await client.move_member(user, kickchan)
+                    except:
+                        print('error moving user')
+                    kicklist.append(user.mention)
+                await client.delete_channel(kickchan)
+                kickstr = ' '.join(kicklist)
+                if len(sep) == 2:
+                    title = 'User '+kickstr+' has been kicked from the channel'
+                    await sendembed('No', message.channel, title, None, message.author)
+                    await client.delete_message(message)
+                else:
+                    title = 'Users '+kickstr+' have been kicked from the channel'
+                    await sendembed('No', message.channel, title, None, message.author)
+                    await client.delete_message(message)
+            else:
+                await sendembed('What', message.channel, 'Command Syntax', '$bkick [@user1] [@user2], etc.', None)
         elif message.author.id=='204255221017214977' and ccheck==True and ('Reported' in message.content):
             await client.add_reaction(message, '✅')
-        elif message.content.startswith('$') and mcheck == False and isitme == False and ccheck == True:
-            await client.send_message(message.channel, 'You do not have permission to use this command.')
     else:
         return
 tokenobject = open('tokenid', 'rb')
