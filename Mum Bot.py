@@ -371,11 +371,16 @@ async def on_reaction_add(reaction, user):
             await client.add_reaction(publicvotemessage, '👍')
             await client.add_reaction(publicvotemessage, '👎')
             await client.delete_message(reaction.message)
-    elif (scheck == True) and (mcheck == True) and (ccheck == True) and (isitme == False) and (reaction.emoji=='✅'):
+    elif (scheck == True) and (mcheck == True) and (reaction.message.channel.id == '326122367795593226') and (isitme == False):
         dcheck = reaction.emoji
         if reaction.message.author.id=='204255221017214977' and ('Reported' in reaction.message.content):
             descrip = reaction.message.content
-            await sendembed('Yes', reaction.message.channel, 'Report Handled', descrip, user)
+            if dcheck == '✅':
+                await sendembed('Yes', reaction.message.channel, 'Report Handled', descrip, user)
+            elif dcheck == '🚫':
+                await sendembed('No', reaction.message.channel, 'Report Dismissed', descrip, user)
+            elif dcheck == '⚠':
+                await sendembed('Maybe', reaction.message.channel, 'Troll Report', descrip, user)
             await client.delete_message(reaction.message)
     elif (scheck==True) and (reaction.emoji == '⭐') and (reaction.message.channel.id!='301798483525107712') and (reaction.message.author.id != '155149108183695360') and (reaction.message.author.id != '204255221017214977'):
         post_reactions = reaction.message.reactions
@@ -1612,6 +1617,11 @@ async def on_message(message):
                 await sendembed('What', message.channel, 'Command Syntax', '$bkick [@user1] [@user2], etc.', None)
         elif message.author.id=='204255221017214977' and ccheck==True and ('Reported' in message.content):
             await client.add_reaction(message, '✅')
+            time.sleep(0.5)
+            await client.add_reaction(message, '🚫')
+            time.sleep(0.5)
+            await client.add_reaction(message, '⚠')
+            time.sleep(0.5)
     else:
         return
 tokenobject = open('tokenid', 'rb')
