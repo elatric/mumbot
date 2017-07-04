@@ -960,6 +960,7 @@ async def on_message(message):
             elif message.content.startswith('$feature'):
                 parse = message.content
                 sep = parse.split()
+                activefeatures = []
                 if len(sep) == 1:
                     check1 = get('emotesub', 'onoff')
                     if check1 == True:
@@ -972,8 +973,7 @@ async def on_message(message):
                     else:
                         activefeatures.append('voicechannel - off')
                     activestring = ''.join(activefeatures)
-                    await client.send_message(message.channel, 'Feature Status: ' + activestring)
-                    descrip = 'Command Syntax: $feature [feature] [on/off]\n\n' + 'Available Features: emotesub - handles emote submissions, voicechannel - gives users in voice chat access to a voice channel-only channel\n\n' + 'Feature Status: ' + activesting
+                    descrip = '**Command Syntax:** $feature [feature] [on/off]\n\n' + '**Available Features:** emotesub - handles emote submissions, voicechannel - gives users in voice chat access to a voice channel-only channel\n\n' + '**Feature Status:** ' + activestring
                     await sendembed('What', message.channel, 'Feature Information', descrip, None)
                 elif sep[2] == 'on':
                     if sep[1] == 'emotesub':
@@ -1006,7 +1006,7 @@ async def on_message(message):
                     else:
                         await sendembed('Maybe', message.channel, 'Invalid Command', 'The function you have called does not exist. Please type $feature for command syntax and information.', None)
             elif message.content.startswith('$help'):
-                descrip = '$shutdown - shuts #mums_living_room down to the plebs\n$restore - reopens #mums_living_room\n$status - post a status update or edit a status update for an emote\n$feature - turn bot modules on/off\n$purge - delete messages from a channel\n$settings - view roles and channels for this bot\n$modset - set the moderator role for this bot\n$voiceroleset - set the automatic voice role to be given\n$listen - add or remove a channel for the bot to listen to\n$subset - set the emote submission channel\n$modvoteset - set the moderator voting channel\n$voteset - set the user voting channel\n$statset - set the emote status channel\n$memes - list of copypastas\n$pmute - permanently mute a user\n$broadcast - start/end a broadcast\n$bkick - kick a user from the station'
+                descrip = '**🔨 Moderation**\n$shutdown - shuts #mums_living_room down to the plebs\n$restore - reopens #mums_living_room\n$purge - delete messages from a channel\n$pmute - permanently mute a user\n$bkick - kick a user from the station\n\n**🔧 Utility**\n$broadcast - start/end a broadcast\n$feature - turn bot modules on/off\n$settings - view roles and channels for this bot\n$starboard - manage starboard channel and minimum star amount\n$modset - set the moderator role for this bot\n$voiceroleset - set the automatic voice role to be given\n$listen - add or remove a channel for the bot to listen to\n$subset - set the emote submission channel\n$modvoteset - set the moderator voting channel\n$voteset - set the user voting channel\n$statset - set the emote status channel\n\n**🤔 Emotes**\n$status - post a status update or edit a status update for an emote\n$review - view an emote and add vote options to it\n\n**🕹 Fun**\n$memes - list of copypastas'
                 await sendembed('What', message.channel, 'Available Commands', descrip, None)
             elif message.content.startswith('$iloveyou'):
                 await client.send_message(message.channel, 'OK I ADMIT IT I LOVE YOU OK i fucking love you and it breaks my heart when i see you play with someone else or anyone commenting in your profile i just want to be your boyfriend and put a heart in my profile linking to your profile and have a walltext of you commenting cute things i want to play video games talk in discord all night and watch a movie together but you just seem so uninterested in me it fucking kills me and i cant take it anymore i want to remove you but i care too much about you so please i\'m begging you to either love me back or remove me and NEVER contact me again it hurts so much to say this because i need you by my side but if you don\'t love me then i want you to leave because seeing your icon in my friendlist would kill me everyday of my pathetic life')
@@ -1199,6 +1199,7 @@ async def on_message(message):
                 else:
                     await sendembed('What', message.channel, 'Command Syntax', '$pmute [@user1] [@user2], etc.', None)
             elif message.content.startswith('$shutdown'):
+                await sendembed('No', message.channel, 'Shutdown Initiated', None, message.author)
                 storechannel = client.get_channel('214249708711837696')
                 embed = discord.Embed(colour = discord.Colour.dark_red(), type='rich', title = '🚫 Raid/spam protection has shut this channel down', description = 'Due to excessive chat activity, this channel and all voice channels except for music have been temporarily closed for all users.\n\nPlease wait for an admin to address the situation, and do not DM any staff in the meantime.')
                 embed.timestamp = datetime.datetime.now()
@@ -1215,6 +1216,7 @@ async def on_message(message):
                     overwrite2.connect = False
                     await client.edit_channel_permissions(tempchan, targetrole, overwrite2)
             elif message.content.startswith('$restore'):
+                await sendembed('Yes', message.channel, 'Restore Initiated', None, message.author)
                 storechannel = client.get_channel('214249708711837696')
                 embed = discord.Embed(colour = discord.Colour.dark_green(), type='rich', title = '✅ Raid/spam protection has been lifted on this channel', description = 'The situation has been handled and this channel has been reopened.\n\nPlease do not spam messages asking what happened -- refer to the information in #announcements.')
                 embed.timestamp = datetime.datetime.now()
@@ -1286,6 +1288,7 @@ async def on_message(message):
                             await client.edit_channel_permissions(voicechan, user, broadcasterperm)
                         await sendembed('No', message.channel, 'Broadcaster(s) Removed', None, None)
                     elif (sep[1] == 'start') or (sep[1] == 'Start'):
+                        await sendembed('Yes', message.channel, 'Brodcast Starting', None, message.author)
                         voicechanobject = open('voicechan', 'rb')
                         voicechan = pickle.load(voicechanobject)
                         voicechanobject.close()
@@ -1304,6 +1307,7 @@ async def on_message(message):
                         thonksperm.speak = False
                         await client.edit_channel_permissions(voicechan, targetrole, thonksperm)
                     elif (sep[1] == 'end') or (sep[1] == 'end') or (sep[1] == 'stop') or (sep[1] == 'stop'):
+                        await sendembed('Yes', message.channel, 'Broadcast Ending', None, message.author)
                         tempchan = message.author.voice_channel
                         voicechanobject = open('voicechan', 'rb')
                         voicechan = pickle.load(voicechanobject)
