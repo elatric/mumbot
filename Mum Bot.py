@@ -1307,15 +1307,15 @@ async def on_message(message):
                         thonksperm.speak = False
                         await client.edit_channel_permissions(voicechan, targetrole, thonksperm)
                     elif (sep[1] == 'end') or (sep[1] == 'end') or (sep[1] == 'stop') or (sep[1] == 'stop'):
-                        await sendembed('Yes', message.channel, 'Broadcast Ending', None, message.author)
                         tempchan = message.author.voice_channel
                         voicechanobject = open('voicechan', 'rb')
                         voicechan = pickle.load(voicechanobject)
                         voicechanobject.close()
-                        if tempchan.id != voicechan.id:
+                        if (tempchan == None) or (tempchan.id != voicechan.id):
                             await sendembed('Maybe', message.channel, 'Error Ending Broadcast', 'You must be in the broadcast channel to end the broadcast.', None)
                             return
                         else:
+                            await sendembed('No', message.channel, 'Broadcast Ending', None, message.author)
                             storechannel = client.get_channel('301798483525107712')
                             describeme = 'The broadcast has ended and all users have been disconnected. Thank you for listening!'
                             embed = discord.Embed(colour = discord.Colour.dark_red(), type='rich', title = '🎙 Broadcast Ended', description = describeme)
