@@ -1224,7 +1224,7 @@ async def on_message(message):
                 targetrole = discord.utils.get(message.author.server.roles, name='thonks')
                 overwrite1 = discord.PermissionOverwrite()
                 overwrite1.send_messages = None
-                overwrite1.add_reactions = True
+                overwrite1.add_reactions = None
                 await client.edit_channel_permissions(storechannel, targetrole, overwrite1)
                 voiceshutdown = ['323195721086140417', '323197019151925248', '322225458957647872']
                 for number in voiceshutdown:
@@ -1573,7 +1573,7 @@ async def on_message(message):
             targetrole = discord.utils.get(message.author.server.roles, name='thonks')
             overwrite1 = discord.PermissionOverwrite()
             overwrite1.send_messages = None
-            overwrite1.add_reactions = True
+            overwrite1.add_reactions = None
             await client.edit_channel_permissions(storechannel, targetrole, overwrite1)
             voiceshutdown = ['323195721086140417', '323197019151925248', '322225458957647872']
             for number in voiceshutdown:
