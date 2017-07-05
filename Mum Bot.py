@@ -1193,7 +1193,7 @@ async def on_message(message):
                         descrip = 'User ' + ''.join(mutelist) + ' has been permanently muted'
                         await sendembed('No', message.channel, 'User Muted', descrip, message.author)
                     else:
-                        descrip = 'Users ' + ''.join(mutelist) + ' has been permanently muted'
+                        descrip = 'Users ' + ' '.join(mutelist) + ' have been permanently muted'
                         await sendembed('No', message.channel, 'Users Muted', descrip, message.author)
                     await client.delete_message(message)
                 else:
@@ -1501,12 +1501,12 @@ async def on_message(message):
                     descrip = 'User ' + ''.join(mutelist) + ' has been permanently muted'
                     await sendembed('No', message.channel, 'User Muted', descrip, message.author)
                 else:
-                    descrip = 'Users ' + ''.join(mutelist) + ' has been permanently muted'
+                    descrip = 'Users ' + ' '.join(mutelist) + ' have been permanently muted'
                     await sendembed('No', message.channel, 'Users Muted', descrip, message.author)
                 await client.delete_message(message)
             else:
                 await sendembed('What', message.channel, 'Command Syntax', '$pmute [@user1] [@user2], etc.', None)
-        elif message.content.startswith('$iloveyou') and megacheck == True:
+        elif message.content.startswith('$iloveyou') and (megacheck == True or message.author.id == '115110682399080453'):
             await client.send_message(message.channel, 'OK I ADMIT IT I LOVE YOU OK i fucking love you and it breaks my heart when i see you play with someone else or anyone commenting in your profile i just want to be your boyfriend and put a heart in my profile linking to your profile and have a walltext of you commenting cute things i want to play video games talk in discord all night and watch a movie together but you just seem so uninterested in me it fucking kills me and i cant take it anymore i want to remove you but i care too much about you so please i\'m begging you to either love me back or remove me and NEVER contact me again it hurts so much to say this because i need you by my side but if you don\'t love me then i want you to leave because seeing your icon in my friendlist would kill me everyday of my pathetic life')
         elif message.content=='$bruce' and megacheck == True:
             await client.send_message(message.channel, 'Hey its bruce from the lab. I just wanted to say that you\'re honestly the most beautiful girl I\'ve ever seen. I don\'t mean to be creepy or anything i just couldn\'t help myself from approaching u once i saw u talking to mike')
