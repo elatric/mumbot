@@ -1266,6 +1266,7 @@ async def on_message(message):
                         descrip = 'Channel '+voicechan.name +' set as broadcast channel'
                         await sendembed('Yes', message.channel, 'Success', descrip, None)
                     elif (sep[1] == 'add') or (sep[1] == 'Add'):
+                        tempchan = message.author.voice_channel
                         voicechanobject = open('voicechan', 'rb')
                         voicechan = pickle.load(voicechanobject)
                         voicechanobject.close()
@@ -1273,10 +1274,18 @@ async def on_message(message):
                         broadcasterperm = discord.PermissionOverwrite()
                         broadcasterperm.connect = True
                         broadcasterperm.speak = True
+                        await sendembed('Yes', message.channel, 'Broadcaster(s) Added', None, None)
                         for user in userlist:
                             await client.edit_channel_permissions(voicechan, user, broadcasterperm)
-                        await sendembed('Yes', message.channel, 'Broadcaster(s) Added', None, None)
+                            if tempchan != None:
+                                try:
+                                    await client.server_voice_state(user, mute=False)
+                                except:
+                                    pass
+                            else:
+                                await sendembed('Maybe', message.channel, 'Unable to Unmute', 'Please manually unmute the broadcaster(s). You must be in the voice channel for automated unmute to work.', None)
                     elif (sep[1] == 'remove') or (sep[1] == 'Remove'):
+                        tempchan = message.author.voice_channel
                         voicechanobject = open('voicechan', 'rb')
                         voicechan = pickle.load(voicechanobject)
                         voicechanobject.close()
@@ -1284,9 +1293,16 @@ async def on_message(message):
                         broadcasterperm = discord.PermissionOverwrite()
                         broadcasterperm.connect = None
                         broadcasterperm.speak = False
+                        await sendembed('No', message.channel, 'Broadcaster(s) Removed', None, None)
                         for user in userlist:
                             await client.edit_channel_permissions(voicechan, user, broadcasterperm)
-                        await sendembed('No', message.channel, 'Broadcaster(s) Removed', None, None)
+                            if tempchan != None:
+                                try:
+                                    await client.server_voice_state(user, mute=True)
+                                except:
+                                    pass
+                            else:
+                                await sendembed('Maybe', message.channel, 'Unable to Mute', 'Please manually mute the broadcaster(s). You must be in the voice channel for automated mute to work.', None)
                     elif (sep[1] == 'start') or (sep[1] == 'Start'):
                         await sendembed('Yes', message.channel, 'Brodcast Starting', None, message.author)
                         voicechanobject = open('voicechan', 'rb')
