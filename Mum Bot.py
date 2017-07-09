@@ -376,9 +376,9 @@ async def on_reaction_add(reaction, user):
         if reaction.message.author.id=='204255221017214977' and ('Reported' in reaction.message.content):
             descrip = reaction.message.content
             if dcheck == '✅':
-                await sendembed('Yes', reaction.message.channel, 'Report Handled', descrip, user)
+                await sendembed('Yes', reaction.message.channel, 'Action Taken', descrip, user)
             elif dcheck == '🚫':
-                await sendembed('No', reaction.message.channel, 'Report Dismissed', descrip, user)
+                await sendembed('No', reaction.message.channel, 'No Action Necessary', descrip, user)
             elif dcheck == '⚠':
                 await sendembed('Maybe', reaction.message.channel, 'Troll Report', descrip, user)
             await client.delete_message(reaction.message)
