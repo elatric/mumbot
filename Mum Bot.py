@@ -1500,7 +1500,7 @@ async def on_message(message):
                             print('Starboard delete failure')
         elif message.server == None and message.content.startswith('$') and isitme == False:
             await client.send_message(message.author, 'You cannot use commands in DMs.')
-        elif message.content.startswith('$pmute') and isitme == False:
+        elif message.content.startswith('$pmute') and (mcheck == True) and (isitme == False):
             parse = message.content
             sep = parse.split()
             muterole = discord.utils.get(message.author.server.roles, id='303319098430062602')
