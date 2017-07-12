@@ -5,6 +5,7 @@ import datetime
 from apscheduler.schedulers.background import BackgroundScheduler
 import pickle
 import time
+import os
 
 client = discord.Client()
 
@@ -20,9 +21,14 @@ def logwrite():
         if user.status != discord.Status.offline:
             count2 += 1
     data = [date, time, count2, count1]
-    wfile = open('mcountlogs.csv', 'a', newline='')
-    writer = csv.writer(wfile, delimiter = ',')
-    writer.writerow(data)
+    if os.path.exists('mcountlogs.csv'):
+        wfile = open('mcountlogs.csv', 'a', newline='')
+        writer = csv.writer(wfile, delimiter = ',')
+        writer.writerow(data)
+    else:
+        wfile = open('mcountlogs.csv', 'wb', newline='')
+        writer = csv.writer(wfile, delimiter = ',')
+        writer.writerow(data)
 
 def logstart():
     print('Logging started')
