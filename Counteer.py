@@ -13,11 +13,13 @@ def logwrite():
     dt = datetime.datetime.now()
     date = str(dt.month) + '/' + str(dt.day)
     time = str(dt.hour) + ':' + str(dt.minute)
-    count = 0
+    count1 = 0
+    count2 = 0
     for user in server.members:
+        count1 += 1
         if user.status != discord.Status.offline:
-            count += 1
-    data = [date, time, count]
+            count2 += 1
+    data = [date, time, count2, count1]
     wfile = open('mcountlogs.csv', 'a', newline='')
     writer = csv.writer(wfile, delimiter = ',')
     writer.writerow(data)
