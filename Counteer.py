@@ -12,7 +12,7 @@ client = discord.Client()
 def logwrite():
     server = client.get_server('214249708711837696')
     dt = datetime.datetime.now()
-    date = str(dt.month) + '/' + str(dt.day)
+    date = str(dt.month) + '/' + str(dt.day) + '/' + str(dt.year)
     time = str(dt.hour) + ':' + str(dt.minute)
     count1 = 0
     count2 = 0
