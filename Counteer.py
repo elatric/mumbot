@@ -26,14 +26,14 @@ def logwrite():
         writer = csv.writer(wfile, delimiter = ',')
         writer.writerow(data)
     else:
-        wfile = open('mcountlogs.csv', 'wb', newline='')
+        wfile = open('mcountlogs.csv', 'w')
         writer = csv.writer(wfile, delimiter = ',')
         writer.writerow(data)
 
 def logstart():
     print('Logging started')
     sched = BackgroundScheduler()
-    sched.add_job(logwrite, 'interval', minutes=15)
+    sched.add_job(logwrite, 'interval', minutes = 10)
     sched.start()
 
 @client.event
