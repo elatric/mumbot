@@ -1390,19 +1390,17 @@ async def on_message(message):
                 else:
                     await sendembed('What', message.channel, 'Command Syntax', '$bkick [@user1] [@user2], etc.', None)
             elif message.content.startswith('$memberdata'):
-                try:
-                    dtokenobject = open('dtoken', 'rb')
-                    dtokenid = pickle.load(dtokenobject)
-                    dtokenobject.close()
-                    d = dropbox.Dropbox(dtokenid)
-                    targetfile = '/' + str(datetime.datetime.now().month) + '-' + str(datetime.datetime.now().day) + ' ' + str(datetime.datetime.now().hour) + ':' +  str(datetime.datetime.now().minute) + ' MEMBER COUNT.csv'
-                    with open('mcountlogs.csv', 'rb') as f:
-                        meta = d.files_upload(f.read(), targetfile, mode=dropbox.files.WriteMode("overwrite"))
-                    link = d.sharing_create_shared_link(targetfile)
-                    url = link.url
-                    await sendembed('Yes', message.channel, 'Member Data Uploaded', url, None)
-                except:
-                    await sendembed('Maybe', message.channel, 'Member Data Failed to Upload', 'Yell at mum', None)
+                dtokenobject = open('dtoken', 'rb')
+                dtokenid = pickle.load(dtokenobject)
+                dtokenobject.close()
+                d = dropbox.Dropbox(dtokenid)
+                targetfile = '/' + str(datetime.datetime.now().month) + '-' + str(datetime.datetime.now().day) + ' ' + str(datetime.datetime.now().hour) + ':' +  str(datetime.datetime.now().minute) + ' MEMBER COUNT.csv'
+                with open('mcountlogs.csv', 'rb') as f:
+                    meta = d.files_upload(f.read(), targetfile, mode=dropbox.files.WriteMode("overwrite"))
+                link = d.sharing_create_shared_link(targetfile)
+                url = link.url
+                await sendembed('Yes', message.channel, 'Member Data Uploaded', url, None)
+                    #await sendembed('Maybe', message.channel, 'Member Data Failed to Upload', 'Yell at mum', None)
             else:
                 await sendembed('Maybe', message.channel, 'Invalid Command', None, None)
         elif (scheck == True) and (subtrue == True) and (emotesub == True) and (isitme == False):
