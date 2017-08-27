@@ -1111,7 +1111,7 @@ async def on_message(message):
                     await sendembed('What', message.channel, 'Command Syntax', '$purge [# of messages to purge]` -- number must be >= 2', None)
                 else:
                     await sendembed('What', message.channel, 'Invalid Command', 'Type `$purge` for command syntax', None)
-            elif message.content.startswith('$terminate'):
+            elif (message.content.startswith('$terminate')) and (message.author.id == 119815473750736899):
                 await sendembed('No', message.channel, 'Bot Terminated', None, message.author)
                 await client.delete_message(message)
                 sys.exit()
