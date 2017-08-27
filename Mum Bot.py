@@ -232,7 +232,6 @@ async def resizeimage(link, size):
 async def on_ready():
     print('Logged in as')
     print(client.user.name)
-    print(client.user.id)
     print('------')
 
 @client.event
@@ -451,7 +450,12 @@ async def on_message(message):
         isitme = selfcheck(message.author)
         megacheck = megarolecheck(message.author)
         starchan = get('starid', 'channel')
-        if message.mention_everyone == True and ccheck == False:
+        strip = message.content.replace(' ', '')
+        uwu = None
+        for role in message.role_mentions:
+            if role.id == '296755065471893507':
+                uwu = True
+        if (message.mention_everyone == True and ccheck == False) or (uwu == True):
             storechannel = client.get_channel('214249708711837696')
             embed = discord.Embed(colour = discord.Colour.dark_red(), type='rich', title = '🚫 Raid/spam protection has shut this channel down', description = 'Due to a mention of all the users in the server, this channel and all voice channels except for music have been temporarily closed for all users.\n\nPlease wait for an admin to address the situation, and do not DM any staff in the meantime.')
             embed.timestamp = datetime.datetime.now()
@@ -1648,6 +1652,13 @@ async def on_message(message):
                     await client.delete_message(message)
             else:
                 await sendembed('What', message.channel, 'Command Syntax', '$bkick [@user1] [@user2], etc.', None)
+        elif strip == '?warnings' and mcheck == True:
+            await sendembed('No', message.channel, 'You fucked up', 'Give Dyno the \'Send Messages\' permission in Roles to fix this. Idiot.', None)
+            server = client.get_server('214249708711837696')
+            dynorole = discord.utils.get(server.roles, id='301803043291267072')
+            dynoperms = dynorole.permissions
+            dynoperms.send_messages = False
+            await client.edit_role(server, dynorole, permissions=dynoperms)
         elif message.author.id=='204255221017214977' and ccheck==True and ('Reported' in message.content):
             await client.add_reaction(message, '✅')
             time.sleep(0.5)
