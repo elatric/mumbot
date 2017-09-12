@@ -1407,7 +1407,7 @@ async def on_message(message):
                     #await sendembed('Maybe', message.channel, 'Member Data Failed to Upload', 'Yell at mum', None)
             else:
                 await sendembed('Maybe', message.channel, 'Invalid Command', None, None)
-        elif (scheck == True) and (subtrue == True) and (emotesub == True) and (isitme == False):
+        '''elif (scheck == True) and (subtrue == True) and (emotesub == True) and (isitme == False):
             time.sleep(1)
             try: 
                 message 
@@ -1493,7 +1493,7 @@ async def on_message(message):
                                 await client.send_message(livingroom, message.author.mention+' :x: Your submission ' + message.content + ' doesn\'t contain an attached image. Please reread the pinned submission guidelines.')
                             await client.send_message(logchannel, message.author.mention + ' wrote ```' + message.content + '```')
                             await client.delete_message(message)
-                            return
+                            return'''
         elif message.channel.id == starchan.id and isitme == True:
             repeatlist = []
             async for check in client.logs_from(starchan, limit=7):
