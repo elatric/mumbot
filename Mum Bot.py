@@ -117,12 +117,12 @@ def channelcheck(message):
     if good == 0:
         return False
 
-def subcheck(message):
+'''def subcheck(message):
     subchan = get('subid', 'channel')
     if message.channel.id == subchan.id:
         return True
     else:
-        return False
+        return False'''
 
 def delcheck(message):
     if message.content == 'yes' or message.content == 'no' or message.content == 'Yes' or message.content == 'No':
@@ -446,7 +446,7 @@ async def on_message(message):
         scheck = servercheck(message)
         ccheck = channelcheck(message)
         emotesub = get('emotesub', 'onoff')
-        subtrue = subcheck(message)
+        #subtrue = subcheck(message)
         isitme = selfcheck(message.author)
         megacheck = megarolecheck(message.author)
         starchan = get('starid', 'channel')
