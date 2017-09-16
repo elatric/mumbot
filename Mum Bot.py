@@ -254,15 +254,12 @@ async def on_reaction_add(reaction, user):
     scheck = servercheck(reaction.message)
     mcheck = modcheck(user)
     isitme = selfcheck(user)
-    mvchannel = get('modvote', 'channel')
     emotesub = get('emotesub', 'onoff')
     ccheck = channelcheck(reaction.message)
     mvtrue = False
     found_embeds_temp = reaction.message.embeds
     server = client.get_server('214249708711837696')
-    if mvchannel.id == reaction.message.channel.id:
-        mvtrue = True
-    if (scheck == True) and (mcheck == True) and (mvtrue == True) and (isitme == False) and (emotesub == True) and (len(found_embeds_temp) != 0) and ((reaction.emoji == '❌') or (reaction.emoji == '✅')):
+    if (scheck == True) and (mcheck == True) and (isitme == False) and (emotesub == True) and (len(found_embeds_temp) != 0) and ((reaction.emoji == '❌') or (reaction.emoji == '✅')):
         livingroom = client.get_channel('214249708711837696')
         verdict = reaction.emoji
         sendmedaddy = get('modvote', 'channel')
