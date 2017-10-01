@@ -470,7 +470,7 @@ async def on_message(message):
                 targetrole = discord.utils.get(message.author.server.roles, name='thonks')
                 await client.remove_roles(message.author, targetrole)
                 await sendembed('No', mum, '@everyone mention detected', 'User ' + message.author.mention +' has mentioned everyone and been automatically demoted.', None)
-                '''embed = discord.Embed(colour = discord.Colour.dark_red(), type='rich', title = '🚫 Raid/spam protection has shut this channel down', description = 'Due to a mention of all the users in the server, this channel and all voice channels except for music have been temporarily closed for all users.\n\nPlease wait for an admin to address the situation, and do not DM any staff in the meantime.')
+                embed = discord.Embed(colour = discord.Colour.dark_red(), type='rich', title = '🚫 Raid/spam protection has shut this channel down', description = 'Due to a mention of all the users in the server, this channel and all voice channels except for music have been temporarily closed for all users.\n\nPlease wait for an admin to address the situation, and do not DM any staff in the meantime.')
                 embed.timestamp = datetime.datetime.now()
                 lockchannels = ['214249708711837696', '358579062270328833', '357001028769546252', '356816009778167809', '313544575698337792']
                 for number in lockchannels:
@@ -487,7 +487,7 @@ async def on_message(message):
                     tempchan = client.get_channel(number)
                     overwrite2 = discord.PermissionOverwrite()
                     overwrite2.connect = False
-                    await client.edit_channel_permissions(tempchan, targetrole, overwrite2)'''
+                    await client.edit_channel_permissions(tempchan, targetrole, overwrite2)
         elif (mcheck == True) and (scheck == True) and (ccheck == True) and (message.content.startswith('$')) and (isitme == False):
             if message.content.startswith('$status'):
                 vote = get('voteid', 'channel')
