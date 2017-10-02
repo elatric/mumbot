@@ -2,6 +2,7 @@ import discord
 import asyncio
 import pickle 
 import datetime
+from datetime import timedelta
 import os
 import time
 import logging
@@ -233,6 +234,21 @@ async def on_ready():
     print('Logged in as')
     print(client.user.name)
     print('------')
+
+@client.event
+async def on_member_join(member):
+    ctime = member.created_at
+    ntime = datetime.datetime.utcnow()
+    tdiff1 = (ntime - ctime)
+    seconds = tdiff1.total_seconds()
+    tdiff = seconds/60
+    bnum = get('autoban', 'int')
+    mchan = client.get_channel('305194878139367427')
+    if bnum == 0:
+        pass
+    elif (tdiff <= bnum):
+        await sendembed('Maybe', mchan, 'Newly Created Account Banned', 'User ' + member.mention + ' has been banned for having a creation time that was ' + str(tdiff) + ' minutes ago.', None)
+        await client.ban(member)
 
 '''@client.event
 @asyncio.coroutine
@@ -1476,6 +1492,16 @@ async def on_message(message):
                 url = link.url
                 await sendembed('Yes', message.channel, 'Member Data Uploaded', url, None)
                     #await sendembed('Maybe', message.channel, 'Member Data Failed to Upload', 'Yell at mum', None)
+            elif message.content.startswith('$autoban'):
+                parse = message.content
+                sep = parse.split()
+                if len(sep) != 2:
+                    await sendembed('No', message.channel, 'Invalid Number of Variables', None, None)
+                else:
+                    banobject = open('autoban', 'wb')
+                    pickle.dump(sep[1], banobject)
+                    banobject.close()
+                    await sendembed('Yes', message.channel, 'Autoban Time Updated', 'Autoban time has been set to creation within the past ' + sep[1] + ' minutes', None)
             else:
                 await sendembed('Maybe', message.channel, 'Invalid Command', None, None)
         elif message.channel.id == starchan.id and isitme == True:
