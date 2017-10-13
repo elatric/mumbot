@@ -404,6 +404,10 @@ async def on_reaction_add(reaction, user):
             if tempreact.emoji == '⭐':
                 starlist = await client.get_reaction_users(tempreact, limit=5)
                 starnum = tempreact.count
+        # fuck selfstarring thots
+        if reaction.message.author in starlist:
+            selfstar_alert = '🚨 🚨 ' + reaction.message.author.mention + ' IS A THOT AND SELF-STARRED THEIR MEME 🚨 🚨'
+            await client.send_message(reaction.message.channel, selfstar_alert)
         modstar = 0
         for reactor in starlist:
             if (reactor.id == '119815473750736899') or (modcheck(reactor) == True):
@@ -428,10 +432,6 @@ async def on_reaction_add(reaction, user):
                 except:
                     print('I tried')
             info = '⭐ ' + reaction.message.channel.mention + ' ID: ' + reaction.message.id
-            # fuck selfstarring thots
-            if reaction.message.id in starlist:
-                selfstar_alert = '🚨 🚨 ' + reaction.message.author.mention + ' IS A THOT AND SELF-STARRED THEIR MEME 🚨 🚨'
-                await client.send_message(reaction.message.channel, selfstar_alert)
             await client.send_message(starchan, info, embed = post)
             return
         elif starnum == starnumbase and modstar == 0:
@@ -454,10 +454,6 @@ async def on_reaction_add(reaction, user):
                 except:
                     print('I tried')
             info = '⭐ ' + reaction.message.channel.mention + ' ID: ' + reaction.message.id
-            # fuck selfstarring thots
-            if reaction.message.id in starlist:
-                selfstar_alert = '🚨 🚨 ' + reaction.message.author.mention + ' IS A THOT AND SELF-STARRED THEIR MEME 🚨 🚨'
-                await client.send_message(reaction.message.channel, selfstar_alert)
             await client.send_message(starchan, info, embed = post)
 
 @client.event
