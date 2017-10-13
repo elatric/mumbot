@@ -428,7 +428,11 @@ async def on_reaction_add(reaction, user):
                 except:
                     print('I tried')
             info = '⭐ ' + reaction.message.channel.mention + ' ID: ' + reaction.message.id
-            await client.send_message(starchan, info, embed = post)
+            # fuck selfstarring thots
+            if reaction.message.id in starlist:
+                selfstar_alert = '🚨 🚨 ' + reaction.message.author.mention + ' IS A THOT AND SELF-STARRED THEIR MEME 🚨 🚨'
+                await client.send_message(reaction.message.channel, selfstar_alert)
+            await client.send_message(starchan, info, embed = post) ###################################################################################### RIGHT HERE, DUMBFUCK
             return
         elif starnum == starnumbase and modstar == 0:
             starchan = get('starid', 'channel')
@@ -450,6 +454,10 @@ async def on_reaction_add(reaction, user):
                 except:
                     print('I tried')
             info = '⭐ ' + reaction.message.channel.mention + ' ID: ' + reaction.message.id
+            # fuck selfstarring thots
+            if reaction.message.id in starlist:
+                selfstar_alert = '🚨 🚨 ' + reaction.message.author.mention + ' IS A THOT AND SELF-STARRED THEIR MEME 🚨 🚨'
+                await client.send_message(reaction.message.channel, selfstar_alert)
             await client.send_message(starchan, info, embed = post)
 
 @client.event
