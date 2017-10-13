@@ -432,7 +432,7 @@ async def on_reaction_add(reaction, user):
             if reaction.message.id in starlist:
                 selfstar_alert = '🚨 🚨 ' + reaction.message.author.mention + ' IS A THOT AND SELF-STARRED THEIR MEME 🚨 🚨'
                 await client.send_message(reaction.message.channel, selfstar_alert)
-            await client.send_message(starchan, info, embed = post) ###################################################################################### RIGHT HERE, DUMBFUCK
+            await client.send_message(starchan, info, embed = post)
             return
         elif starnum == starnumbase and modstar == 0:
             starchan = get('starid', 'channel')
