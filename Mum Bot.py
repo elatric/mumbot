@@ -408,6 +408,7 @@ async def on_reaction_add(reaction, user):
         if reaction.message.author in starlist:
             selfstar_alert = '🚨 🚨 ' + reaction.message.author.mention + ' IS A THOT AND SELF-STARRED THEIR MEME 🚨 🚨'
             await client.send_message(reaction.message.channel, selfstar_alert)
+            await client.remove_reaction(reaction.message, reaction.emoji, reaction.message.author)
         modstar = 0
         for reactor in starlist:
             if (reactor.id == '119815473750736899') or (modcheck(reactor) == True):
