@@ -67,8 +67,6 @@ def megarolecheck(user):
         else:
             return True
     except:
-        print('ERROR RETRIEVING USER')
-        print(user.id)
         return False
 
 def get(name, returntype):
@@ -1736,7 +1734,9 @@ async def on_message(message):
     elif message.channel.id=='300752762973585418':
         emb = message.embeds
         logembed = emb[0]
-        if logembed['description'] == '.pick':
+        logdesc = logembed['description']
+        loglist = logdesc.split(' ')
+        if ('.pick' in loglist[6]) and (len(loglist)==7):
             await client.delete_message(message)
     else:
         return
