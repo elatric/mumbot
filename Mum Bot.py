@@ -11,6 +11,7 @@ import sys
 import wget
 import socket
 import dropbox
+import re
 
 logger = logging.getLogger('discord')
 logger.setLevel(logging.WARNING)
@@ -432,25 +433,25 @@ async def on_reaction_add(reaction, user):
                     post.set_image(url=post_image)
                 except:
                     print('I tried')
-            mContList = reaction.message.content.split(' ')
+            mContList = reaction.message.content
+            image_links = re.findall(r"(http(s|):\/\/(.+?)(png|jpg|jpeg|gif|bmp))", mContList, flags=re.I|re.M)
             iqueue = []
-            for item in mContList:
-                if ('.png' or '.jpg' or '.jpeg' or '.gif' or '.bmp') in item:
-                    iqueue.append(item)
+            for item in image_links:
+                iqueue.append(item[0])
             if (len(iqueue) != 0):
                 try:
-                    post.set_image(url=iqueue[0])
+                    for item in iqueue:
+                        post.set_image(url=item)
+                        info = '⭐ ' + reaction.message.channel.mention + ' ID: ' + reaction.message.id
+                        await client.send_message(starchan, info, embed = post)
+                        time.sleep(1)
                 except:
                     pass
-            info = '⭐ ' + reaction.message.channel.mention + ' ID: ' + reaction.message.id
-            await client.send_message(starchan, info, embed = post)
-            time.sleep(1)
-            if (len(iqueue) > 1):
-                post.description = None
-                for num in range(len(iqueue)-1):
-                    post.set_image(url=iqueue[num+1])
-                    await client.send_message(starchan, embed = post)
-                    time.sleep(1)
+            else:
+                info = '⭐ ' + reaction.message.channel.mention + ' ID: ' + reaction.message.id
+                await client.send_message(starchan, info, embed = post)
+                time.sleep(1)
+            
 @client.event
 async def on_message(message):
     mcheck = modcheck(message.author)
