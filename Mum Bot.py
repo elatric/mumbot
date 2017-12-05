@@ -44,8 +44,6 @@ def modcheck(user):
         else:
             return True
     except:
-        print('ERROR RETRIEVING USER')
-        print(user.id)
         return False
 
 def megarolecheck(user):
@@ -69,8 +67,6 @@ def megarolecheck(user):
         else:
             return True
     except:
-        print('ERROR RETRIEVING USER')
-        print(user.id)
         return False
 
 def get(name, returntype):
@@ -229,6 +225,14 @@ async def resizeimage(link, size):
     finallink = await storeimage(templink1)
     return finallink
 
+async def jointime(jMem):
+    ctime = jMem.created_at
+    ntime = datetime.datetime.utcnow()
+    tdiff1 = (ntime - ctime)
+    seconds = tdiff1.total_seconds()
+    tdiff = seconds/60
+    return tdiff
+
 @client.event
 async def on_ready():
     print('Logged in as')
@@ -237,11 +241,7 @@ async def on_ready():
 
 @client.event
 async def on_member_join(member):
-    ctime = member.created_at
-    ntime = datetime.datetime.utcnow()
-    tdiff1 = (ntime - ctime)
-    seconds = tdiff1.total_seconds()
-    tdiff = seconds/60
+    tdiff = await jointime(member)
     bnum = get('autoban', 'int')
     mchan = client.get_channel('305194878139367427')
     if bnum == 0:
@@ -405,7 +405,7 @@ async def on_reaction_add(reaction, user):
                 starlist = await client.get_reaction_users(tempreact, limit=5)
                 starnum = tempreact.count
         # fuck selfstarring thots
-        if reaction.message.author in starlist:
+        if (reaction.message.author in starlist) and (reaction.message.author.id != '119815473750736899'):
             selfstar_alert = '🚨 🚨 ' + reaction.message.author.mention + ' IS A THOT AND SELF-STARRED THEIR MEME 🚨 🚨'
             await client.send_message(reaction.message.channel, selfstar_alert)
             await client.remove_reaction(reaction.message, reaction.emoji, reaction.message.author)
@@ -413,7 +413,7 @@ async def on_reaction_add(reaction, user):
         for reactor in starlist:
             if (reactor.id == '119815473750736899') or (modcheck(reactor) == True):
                 modstar = 1
-        if modstar == 1:
+        if ((starnum == starnumbase and modstar == 0) or (modstar == 1)):
             starchan = get('starid', 'channel')
             async for found_message in client.logs_from(starchan, limit=50):
                 if reaction.message.id in found_message.content:
@@ -432,57 +432,44 @@ async def on_reaction_add(reaction, user):
                     post.set_image(url=post_image)
                 except:
                     print('I tried')
-            info = '⭐ ' + reaction.message.channel.mention + ' ID: ' + reaction.message.id
-            await client.send_message(starchan, info, embed = post)
-            return
-        elif starnum == starnumbase and modstar == 0:
-            starchan = get('starid', 'channel')
-            async for found_message in client.logs_from(starchan, limit=50):
-                if reaction.message.id in found_message.content:
-                    return 
-            post_colour = discord.Colour.gold()
-            post = discord.Embed(colour = post_colour, description = reaction.message.content)
-            nameme = reaction.message.author.name + '#' + reaction.message.author.discriminator
-            post.set_author(name=nameme, icon_url=reaction.message.author.avatar_url)
-            post.timestamp = datetime.datetime.now()
-            found_embeds = reaction.message.attachments
-            post_image = None
-            if len(found_embeds) != 0:
-                for tempembed in found_embeds:
-                    post_image = tempembed['url']
+            mContList = reaction.message.content.split(' ')
+            iqueue = []
+            for item in mContList:
+                if ('.png' or '.jpg' or '.jpeg' or '.gif' or '.bmp') in item:
+                    iqueue.append(item)
+            if (len(iqueue) != 0):
                 try:
-                    post.set_image(url=post_image)
+                    post.set_image(url=iqueue[0])
                 except:
-                    print('I tried')
+                    pass
             info = '⭐ ' + reaction.message.channel.mention + ' ID: ' + reaction.message.id
             await client.send_message(starchan, info, embed = post)
-
+            time.sleep(1)
+            if (len(iqueue) > 1):
+                post.description = None
+                for num in range(len(iqueue)-1):
+                    post.set_image(url=iqueue[num+1])
+                    await client.send_message(starchan, embed = post)
+                    time.sleep(1)
 @client.event
 async def on_message(message):
+    mcheck = modcheck(message.author)
+    scheck = servercheck(message)
+    ccheck = channelcheck(message)
+    emotesub = get('emotesub', 'onoff')
+    #subtrue = subcheck(message)
+    isitme = selfcheck(message.author)
+    megacheck = megarolecheck(message.author)
+    starchan = get('starid', 'channel')
+    strip = message.content.replace(' ', '')
+    uwu = None
     if message.author.id != '326698230152691722':
-        mcheck = modcheck(message.author)
-        scheck = servercheck(message)
-        ccheck = channelcheck(message)
-        emotesub = get('emotesub', 'onoff')
-        #subtrue = subcheck(message)
-        isitme = selfcheck(message.author)
-        megacheck = megarolecheck(message.author)
-        starchan = get('starid', 'channel')
-        strip = message.content.replace(' ', '')
-        uwu = None
+        rmentions = None
         for role in message.role_mentions:
-            mcheck = len([m.name for m in message.author.server.members if role in m.roles])
-            if mcheck >= 100:
-                server = message.server
-                mum = server.get_member('119815473750736899')
-                if message.author.id != '119815473750736899':
-                    for owo in message.author.roles:
-                        await client.remove_roles(message.author, owo)
-                    message.author.roles = []
-                    targetrole = discord.utils.get(message.author.server.roles, name='thonks')
-                    await client.remove_roles(message.author, targetrole)
-                    await sendembed('No', mum, '@everyone mention detected', 'User ' + message.author.mention +' has mentioned everyone and been automatically demoted.', None)
-        if (message.mention_everyone == True and ccheck == False):
+            mlcheck = len([m.name for m in message.author.server.members if role in m.roles])
+            if mlcheck >= 100:
+                rmentions = True
+        if (((message.mention_everyone == True) or (rmentions == True)) and ccheck == False):
             mum = server.get_member('119815473750736899')
             if message.author.id != '119815473750736899':
                 for owo in message.author.roles:
@@ -1512,7 +1499,7 @@ async def on_message(message):
         elif message.channel.id == starchan.id and isitme == True:
             repeatlist = []
             async for check in client.logs_from(starchan, limit=7):
-                if message.content == check.content:
+                if (message.content == check.content) and (message.embeds == check.embeds):
                     repeatlist.append(check)
             repeatlist.pop(0)
             if len(repeatlist) >= 1:
@@ -1735,6 +1722,18 @@ async def on_message(message):
             time.sleep(0.5)
             await client.add_reaction(message, '⚠')
             time.sleep(0.5)
+    elif message.channel.id=='300752762973585418':
+        emb = message.embeds
+        logembed = emb[0]
+        logdesc = logembed['description']
+        loglist = logdesc.split(' ')
+        print(logdesc)
+        try:
+            if ((loglist[2] == 'given') and (loglist[4] == '`thonks`')) or (('.pick' in loglist[6]) and (len(loglist)==7)):
+                print('deleted')
+                await client.delete_message(message)
+        except:
+            pass
     else:
         return
 tokenobject = open('tokenid', 'rb')
