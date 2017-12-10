@@ -396,7 +396,8 @@ async def on_reaction_add(reaction, user):
             elif dcheck == '⚠':
                 await sendembed('Maybe', reaction.message.channel, 'Troll Report', descrip, user)
             await client.delete_message(reaction.message)
-    elif (scheck==True) and (reaction.emoji == '⭐') and (reaction.message.channel.id!='301798483525107712') and (reaction.message.author.id != '155149108183695360') and (reaction.message.author.id != '204255221017214977'):
+    elif (scheck==True) and (reaction.emoji == '⭐') and (reaction.message.channel.id!='301798483525107712') and (reaction.message.author.id != '155149108183695360') and (reaction.message.author.id != '204255221017214977') \
+                        and ("IS A THOT AND SELF-STARRED THEIR MEME" not in reaction.message.content):
         post_reactions = reaction.message.reactions
         starnumbase = get('starnum', 'int')
         starnum = 0
