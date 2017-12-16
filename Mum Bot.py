@@ -455,6 +455,16 @@ async def on_reaction_add(reaction, user):
             
 @client.event
 async def on_message(message):
+	#=================$MEMES SETUP VARS=================#
+	#===ALSO COMMENTED DOWN BELOW FOR EASE OF EDITING===#
+	#===================================================#
+	iloveyou = 'OK I ADMIT IT I LOVE YOU OK i fucking love you and it breaks my heart when i see you play with someone else or anyone commenting in your profile i just want to be your boyfriend and put a heart in my profile linking to your profile and have a walltext of you commenting cute things i want to play video games talk in discord all night and watch a movie together but you just seem so uninterested in me it fucking kills me and i cant take it anymore i want to remove you but i care too much about you so please i\'m begging you to either love me back or remove me and NEVER contact me again it hurts so much to say this because i need you by my side but if you don\'t love me then i want you to leave because seeing your icon in my friendlist would kill me everyday of my pathetic life'
+	bruce = 'Hey its bruce from the lab. I just wanted to say that you\'re honestly the most beautiful girl I\'ve ever seen. I don\'t mean to be creepy or anything i just couldn\'t help myself from approaching u once i saw u talking to mike'
+	bruce2 = 'Hey its lab from the bruce. I just wanted to say that you\'re honestly the most ugly girl I\'ve ever seen. I don\'t mean to be amazing or anything i just couldn\'t help myself from approaching u once i saw u talking to mike'
+	hands = 'Thanks bud, so kind\nYour hands were warm\nAnd very very tiny'
+	lovely = 'My dearest long legged, lovely, picturesque treasure, how are you doing today? I\'m better now that you\'re here -- while you\'re still responding, do you want to grab a drink later? Get something to eat? Get married? The usual'
+	confess = 'Your such a fucking bitch honestly you told me to confess and now your turning me down why does anyone like you I hope you take your ugly face and [redacted]'
+	saki = 'l    i    t    e    r    a    l    l    y    a    l    l    d    a    y    e    v    e    r    y    d    a    y    <    3'
     mcheck = modcheck(message.author)
     scheck = servercheck(message)
     ccheck = channelcheck(message)
@@ -1037,27 +1047,37 @@ async def on_message(message):
                         await sendembed('No', message.channel, 'Feature Disabled', 'Automated voice text channel has been turned off.', None)
                     else:
                         await sendembed('Maybe', message.channel, 'Invalid Command', 'The function you have called does not exist. Please type $feature for command syntax and information.', None)
-            elif message.content.startswith('$help'):
+            #$memes and $help 
+			elif message.content.startswith('$help'):
                 descrip = '**🔨 Moderation**\n$shutdown [all/#channel_names] - shuts down channel(s)\n$restore [all/#channel_names]- reopens channel(s)\n$purge - delete messages from a channel\n$pmute - permanently mute a user\n$bkick - kick a user from the station\n\n**🔧 Utility**\n$broadcast - start/end a broadcast\n$feature - turn bot modules on/off\n$settings - view roles and channels for this bot\n$starboard - manage starboard channel and minimum star amount\n$modset - set the moderator role for this bot\n$voiceroleset - set the automatic voice role to be given\n$listen - add or remove a channel for the bot to listen to\n$subset - set the emote submission channel\n$modvoteset - set the moderator voting channel\n$voteset - set the user voting channel\n$statset - set the emote status channel\n\n**🤔 Emotes**\n$status - post a status update or edit a status update for an emote\n$review - view an emote and add vote options to it\n\n**🕹 Fun**\n$memes - list of copypastas'
                 await sendembed('What', message.channel, 'Available Commands', descrip, None)
             elif message.content.startswith('$iloveyou'):
-                await client.send_message(message.channel, 'OK I ADMIT IT I LOVE YOU OK i fucking love you and it breaks my heart when i see you play with someone else or anyone commenting in your profile i just want to be your boyfriend and put a heart in my profile linking to your profile and have a walltext of you commenting cute things i want to play video games talk in discord all night and watch a movie together but you just seem so uninterested in me it fucking kills me and i cant take it anymore i want to remove you but i care too much about you so please i\'m begging you to either love me back or remove me and NEVER contact me again it hurts so much to say this because i need you by my side but if you don\'t love me then i want you to leave because seeing your icon in my friendlist would kill me everyday of my pathetic life')
+				#iloveyou = 'OK I ADMIT IT I LOVE YOU OK i fucking love you and it breaks my heart when i see you play with someone else or anyone commenting in your profile i just want to be your boyfriend and put a heart in my profile linking to your profile and have a walltext of you commenting cute things i want to play video games talk in discord all night and watch a movie together but you just seem so uninterested in me it fucking kills me and i cant take it anymore i want to remove you but i care too much about you so please i\'m begging you to either love me back or remove me and NEVER contact me again it hurts so much to say this because i need you by my side but if you don\'t love me then i want you to leave because seeing your icon in my friendlist would kill me everyday of my pathetic life'
+                await client.send_message(message.channel, str(iloveyou))
             elif message.content=='$bruce':
-                await client.send_message(message.channel, 'Hey its bruce from the lab. I just wanted to say that you\'re honestly the most beautiful girl I\'ve ever seen. I don\'t mean to be creepy or anything i just couldn\'t help myself from approaching u once i saw u talking to mike')
+				#bruce = 'Hey its bruce from the lab. I just wanted to say that you\'re honestly the most beautiful girl I\'ve ever seen. I don\'t mean to be creepy or anything i just couldn\'t help myself from approaching u once i saw u talking to mike'
+                await client.send_message(message.channel, str(bruce))
             elif message.content.startswith('$bruce2'):
-                await client.send_message(message.channel, 'Hey its lab from the bruce. I just wanted to say that you\'re honestly the most ugly girl I\'ve ever seen. I don\'t mean to be amazing or anything i just couldn\'t help myself from approaching u once i saw u talking to mike')
+				#bruce2 = 'Hey its lab from the bruce. I just wanted to say that you\'re honestly the most ugly girl I\'ve ever seen. I don\'t mean to be amazing or anything i just couldn\'t help myself from approaching u once i saw u talking to mike'
+                await client.send_message(message.channel, str(bruce2))
             elif message.content.startswith('$hands'):
-                await client.send_message(message.channel, 'Thanks bud, so kind\nYour hands were warm\nAnd very very tiny')
+				#hands = 'Thanks bud, so kind\nYour hands were warm\nAnd very very tiny'
+                await client.send_message(message.channel,str(hands))
             elif message.content.startswith('$lovely'):
-                await client.send_message(message.channel, 'My dearest long legged, lovely, picturesque treasure, how are you doing today? I\'m better now that you\'re here -- while you\'re still responding, do you want to grab a drink later? Get something to eat? Get married? The usual')    
+				#lovely = 'My dearest long legged, lovely, picturesque treasure, how are you doing today? I\'m better now that you\'re here -- while you\'re still responding, do you want to grab a drink later? Get something to eat? Get married? The usual'
+                await client.send_message(message.channel, str(lovely))    
             elif message.content.startswith('$confess'):
-                await client.send_message(message.channel, 'Your such a fucking bitch honestly you told me to confess and now your turning me down why does anyone like you I hope you take your ugly face and [redacted]')
+				#confess = 'Your such a fucking bitch honestly you told me to confess and now your turning me down why does anyone like you I hope you take your ugly face and [redacted]'
+                await client.send_message(message.channel, str(confess))
             elif message.content.startswith('$saki'):
-                await client.send_message(message.channel, 'l    i    t    e    r    a    l    l    y    a    l    l    d    a    y    e    v    e    r    y    d    a    y    <    3')
+				#saki = 'l    i    t    e    r    a    l    l    y    a    l    l    d    a    y    e    v    e    r    y    d    a    y    <    3'
+                await client.send_message(message.channel, str(saki))
             elif message.content.startswith('$dimash'):
-                di1 = discord.utils.get(message.author.server.emojis, name='dimash1')
-                di2 = discord.utils.get(message.author.server.emojis, name='dimash2')
-                await client.send_message(message.channel, str(di1)+str(di2)+':microphone2: weeeeeeeeeeeeeeeeeeeoooooooooooooooooo')
+                #di1 = discord.utils.get(message.author.server.emojis, name='dimash1')
+                #di2 = discord.utils.get(message.author.server.emojis, name='dimash2')
+                #OLD DIMASH WITH EMOTES# await client.send_message(message.channel, str(di1)+str(di2)+':microphone2: weeeeeeeeeeeeeeeeeeeoooooooooooooooooo')
+				#dimash = ':dimash: :microphone2: weeeeeeeeeeeeeeeeeeeoooooooooooooooooo'
+				await client.send_message(message.channel, str(dimash))
             elif message.content.startswith('$memes'):
                 descrip = '$iloveyou\n$bruce\n$bruce2\n$hands\n$lovely\n$confess\n$roar\n$saki\n$dimash'
                 await sendembed('What', message.channel, 'Memes', descrip, None)
