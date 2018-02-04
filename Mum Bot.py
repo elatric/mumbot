@@ -453,8 +453,12 @@ async def on_reaction_add(reaction, user):
                 await client.send_message(starchan, info, embed = post)
                 time.sleep(1)
     # remove pollbot shrugs from polls
-    elif (scheck == True) and (reaction.emoji == '🤷') and (reaction.message.author.id == '266162291735658496'):
-        await client.remove_reaction(reaction.message, reaction.emoji, reaction.message.author)
+    elif (scheck == True) and (reaction.emoji == '🤷') and ('poll:' in reaction.message.content):
+        pollmum = server.get_member('266162291735658496')
+        try:
+            await client.remove_reaction(reaction.message, reaction.emoji, pollmum)
+        except:
+            pass
             
 @client.event
 async def on_message(message):
