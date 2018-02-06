@@ -27,6 +27,8 @@ server = client.get_server('214249708711837696')
 def modcheck(user):
     modobject = open('modid', 'rb')
     modrole = pickle.load(modobject)
+    modstarobject = open('modstar', 'rb')
+    modstar = pickle.load(modstarobject)
     userid = user.id
     server = client.get_server('214249708711837696')
     try:
@@ -38,6 +40,9 @@ def modcheck(user):
             if role.id == modrole:
                 modtrue = 1
                 break
+        if (modstar == 'false'):
+            modtrue = 0
+        modstarobject.close()
         if modtrue == 0:
             return False
         elif modtrue ==0 and userid == '119815473750736899':
@@ -1045,7 +1050,7 @@ async def on_message(message):
                     else:
                         await sendembed('Maybe', message.channel, 'Invalid Command', 'The function you have called does not exist. Please type $feature for command syntax and information.', None)
             elif message.content.startswith('$help'):
-                descrip = '**🔨 Moderation**\n$shutdown [all/#channel_names] - shuts down channel(s)\n$restore [all/#channel_names]- reopens channel(s)\n$purge - delete messages from a channel\n$pmute - permanently mute a user\n$bkick - kick a user from the station\n\n**🔧 Utility**\n$broadcast - start/end a broadcast\n$feature - turn bot modules on/off\n$settings - view roles and channels for this bot\n$starboard - manage starboard channel and minimum star amount\n$modset - set the moderator role for this bot\n$voiceroleset - set the automatic voice role to be given\n$listen - add or remove a channel for the bot to listen to\n$subset - set the emote submission channel\n$modvoteset - set the moderator voting channel\n$voteset - set the user voting channel\n$statset - set the emote status channel\n\n**🤔 Emotes**\n$status - post a status update or edit a status update for an emote\n$review - view an emote and add vote options to it\n\n**🕹 Fun**\n$memes - list of copypastas'
+                descrip = '**🔨 Moderation**\n$shutdown [all/#channel_names] - shuts down channel(s)\n$restore [all/#channel_names]- reopens channel(s)\n$purge - delete messages from a channel\n$pmute - permanently mute a user\n$bkick - kick a user from the station\n\n**🔧 Utility**\n$broadcast - start/end a broadcast\n$feature - turn bot modules on/off\n$settings - view roles and channels for this bot\n$starboard - manage starboard channel and minimum star amount\n$modstar [true/false] - Turn mod starboard override on/off\n$modset - set the moderator role for this bot\n$voiceroleset - set the automatic voice role to be given\n$listen - add or remove a channel for the bot to listen to\n$subset - set the emote submission channel\n$modvoteset - set the moderator voting channel\n$voteset - set the user voting channel\n$statset - set the emote status channel\n\n**🤔 Emotes**\n$status - post a status update or edit a status update for an emote\n$review - view an emote and add vote options to it\n\n**🕹 Fun**\n$memes - list of copypastas'
                 await sendembed('What', message.channel, 'Available Commands', descrip, None)
             elif message.content.startswith('$iloveyou'):
                 await client.send_message(message.channel, 'OK I ADMIT IT I LOVE YOU OK i fucking love you and it breaks my heart when i see you play with someone else or anyone commenting in your profile i just want to be your boyfriend and put a heart in my profile linking to your profile and have a walltext of you commenting cute things i want to play video games talk in discord all night and watch a movie together but you just seem so uninterested in me it fucking kills me and i cant take it anymore i want to remove you but i care too much about you so please i\'m begging you to either love me back or remove me and NEVER contact me again it hurts so much to say this because i need you by my side but if you don\'t love me then i want you to leave because seeing your icon in my friendlist would kill me everyday of my pathetic life')
@@ -1347,6 +1352,31 @@ async def on_message(message):
                         starobject.close()
                         descrip = 'Minimum star number set as '+starnum
                         await sendembed('Yes', message.channel, 'Success', descrip, None)
+            # set mod star override to true/false, or if no argument is provided, show its current value
+            elif message.content.startswith('$modstar'):
+                parse = message.content
+                sep = parse.split()
+                if len(sep) != 1:
+                    if sep[1].lower() == 'true':
+                        modstarobject = open('modstar', 'wb')
+                        pickle.dump(sep[1].lower(), modstarobject)
+                        modstarobject.close()
+                        descrip = 'Mod star override enabled.'
+                        await sendembed('Yes', message.channel, 'Success', descrip, None)
+                    elif sep[1].lower() == 'false':
+                        modstarobject = open('modstar', 'wb')
+                        pickle.dump(sep[1].lower(), modstarobject)
+                        modstarobject.close()
+                        descrip = 'Mod star override disabled.'
+                        await sendembed('No', message.channel, 'Success', descrip, None)
+                    else:
+                        descrip = 'Invalid value; command syntax is `$modstar [true/false]`'
+                        await sendembed('What', message.channel, 'Failure', descrip, None)
+                else:
+                    modstarobject = open('modstar', 'rb')
+                    descrip = 'Mod star override is currently set to {0}.'.format(pickle.load(modstarobject))
+                    modstarobject.close()
+                    await sendembed('What', message.channel, 'Current Status', descrip, None)
             elif message.content.startswith('$broadcast'):
                 parse = message.content
                 sep = parse.split()
