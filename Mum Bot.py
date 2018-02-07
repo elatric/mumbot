@@ -27,8 +27,6 @@ server = client.get_server('214249708711837696')
 def modcheck(user):
     modobject = open('modid', 'rb')
     modrole = pickle.load(modobject)
-    modstarobject = open('modstar', 'rb')
-    modstar = pickle.load(modstarobject)
     userid = user.id
     server = client.get_server('214249708711837696')
     try:
@@ -40,9 +38,6 @@ def modcheck(user):
             if role.id == modrole:
                 modtrue = 1
                 break
-        if (modstar == 'false'):
-            modtrue = 0
-        modstarobject.close()
         if modtrue == 0:
             return False
         elif modtrue ==0 and userid == '119815473750736899':
@@ -281,6 +276,10 @@ async def on_reaction_add(reaction, user):
     mvtrue = False
     found_embeds_temp = reaction.message.embeds
     server = client.get_server('214249708711837696')
+    # do a quick check to see if mod override is enabled
+    modstarobject = open('modstar', 'rb')
+    overridecheck = True if pickle.load(modstarobject) == 'true' else False
+    modstarobject.close()
     if (scheck == True) and (mcheck == True) and (isitme == False) and (emotesub == True) and (len(found_embeds_temp) != 0) and ((reaction.emoji == '❌') or (reaction.emoji == '✅')):
         livingroom = client.get_channel('214249708711837696')
         verdict = reaction.emoji
@@ -418,7 +417,7 @@ async def on_reaction_add(reaction, user):
             await client.remove_reaction(reaction.message, reaction.emoji, reaction.message.author)
         modstar = 0
         for reactor in starlist:
-            if (reactor.id == '119815473750736899') or (modcheck(reactor) == True):
+            if ((reactor.id == '119815473750736899') or (modcheck(reactor) == True)) and (overridecheck == True):
                 modstar = 1
         if ((starnum == starnumbase and modstar == 0) or (modstar == 1)):
             starchan = get('starid', 'channel')
@@ -1775,6 +1774,7 @@ async def on_message(message):
             pass
     else:
         return
+
 tokenobject = open('tokenid', 'rb')
 tokenid = pickle.load(tokenobject)
 tokenobject.close()
