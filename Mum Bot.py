@@ -27,6 +27,8 @@ server = client.get_server('214249708711837696')
 def modcheck(user):
     modobject = open('modid', 'rb')
     modrole = pickle.load(modobject)
+    modstarobject = open('modstar', 'rb')
+    modstar = pickle.load(modstarobject)
     userid = user.id
     server = client.get_server('214249708711837696')
     try:
@@ -38,6 +40,9 @@ def modcheck(user):
             if role.id == modrole:
                 modtrue = 1
                 break
+        if (modstar == 'false'):
+            modtrue = 0
+        modstarobject.close()
         if modtrue == 0:
             return False
         elif modtrue ==0 and userid == '119815473750736899':
